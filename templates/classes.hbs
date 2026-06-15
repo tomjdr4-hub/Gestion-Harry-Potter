@@ -1,0 +1,72 @@
+<div class="hp4-root">
+  <div class="hp4-classes-wrapper">
+    <nav class="hp4-year-tabs">
+      {{#each years}}
+        <button type="button" class="hp4-year-tab" data-year="{{yearKey}}">{{label}}</button>
+      {{/each}}
+    </nav>
+
+    <div class="hp4-year-panels">
+      {{#each years}}
+        <div class="hp4-year-panel hp4-year-drop" data-year="{{yearKey}}">
+          <div class="hp4-houses-grid">
+            {{#each ../houses}}
+            <div class="hp4-house-zone hp4-house-drop"
+                 data-year="{{../yearKey}}"
+                 data-house="{{key}}">
+              <h4 class="hp4-house-title hp4-house-{{key}}">
+                <i class="{{icon}}"></i> {{label}}
+              </h4>
+              <div class="hp4-actors-grid">
+                {{#each (lookup ../actors key)}}
+                  <div class="hp4-actor-card" data-id="{{id}}" draggable="true"
+     data-source-year="{{../../yearKey}}"
+     data-source-house="{{../key}}">
+                    <img src="{{img}}" alt="{{name}}" draggable="false" />
+                    <span>{{name}}</span>
+                    {{#if ../../../../isGM}}
+                      <button type="button" class="hp4-remove-actor"
+                              data-id="{{id}}"
+                              data-year="{{../../yearKey}}"
+                              data-house="{{../key}}"
+                              title="Retirer">
+                        <i class="fas fa-times"></i>
+                      </button>
+                    {{/if}}
+                    <button type="button" class="hp4-note-btn" data-id="{{id}}" title="Journal">
+                      <i class="fas fa-book"></i>
+                      {{#with (lookup ../../../../actorNotes id)}}
+                        {{#if this.length}}
+                          <span class="hp4-note-count">{{this.length}}</span>
+                        {{/if}}
+                      {{/with}}
+                    </button>
+                  </div>
+                {{else}}
+                  <p class="hp4-empty">Aucun élève</p>
+                {{/each}}
+              </div>
+            </div>
+            {{/each}}
+          </div>
+          {{#if ../isGM}}
+            <p class="hp4-hint"><i class="fas fa-info-circle"></i> Glissez des acteurs dans une maison</p>
+          {{/if}}
+        </div>
+      {{/each}}
+    </div>
+  </div>
+
+  <!-- Modal journal -->
+  <div class="hp4-note-modal" style="display:none">
+    <div class="hp4-note-modal-inner">
+      <h3><i class="fas fa-book"></i> Journal — <span class="hp4-note-actor-name"></span></h3>
+      <div class="hp4-note-journal"></div>
+      <textarea class="hp4-note-textarea" rows="3" placeholder="Ajouter une note..."></textarea>
+      <div class="hp4-note-actions">
+        <button type="button" class="hp4-note-save">Ajouter</button>
+        <button type="button" class="hp4-note-cancel">Fermer</button>
+      </div>
+    </div>
+  </div>
+</div>

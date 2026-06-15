@@ -1,0 +1,113 @@
+.hp4-cup-wrapper {
+  padding: 1rem;
+  text-align: center;
+}
+
+.hp4-cup-title {
+  font-size: 1.3rem;
+  margin-bottom: 1.5rem;
+  letter-spacing: 0.05em;
+}
+
+.hp4-cup-houses {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  gap: 1rem;
+}
+
+.hp4-cup-house {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* Sablier */
+.hp4-cup-hourglass {
+  width: 60px;
+  height: 160px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hp4-cup-hourglass-top,
+.hp4-cup-hourglass-bottom {
+  width: 60px;
+  height: 70px;
+  border: 3px solid var(--house-color);
+  background: var(--house-bg);
+  overflow: hidden;
+  position: relative;
+}
+
+.hp4-cup-hourglass-top {
+  clip-path: polygon(0 0, 100% 0, 70% 100%, 30% 100%);
+  display: flex;
+  align-items: flex-end;
+}
+
+.hp4-cup-hourglass-bottom {
+  clip-path: polygon(30% 0, 70% 0, 100% 100%, 0 100%);
+  display: flex;
+  align-items: flex-start;
+}
+
+.hp4-cup-hourglass-neck {
+  width: 8px;
+  height: 20px;
+  background: var(--house-color);
+  opacity: 0.6;
+}
+
+.hp4-cup-fill {
+  width: 100%;
+  background: var(--house-color);
+  opacity: 0.7;
+  transition: height 0.6s ease;
+  align-self: flex-end;
+}
+
+.hp4-cup-fill-bottom {
+  width: 100%;
+  background: var(--house-color);
+  opacity: 0.7;
+  transition: height 0.6s ease;
+}
+
+.hp4-cup-label {
+  font-weight: bold;
+  color: var(--house-color);
+  font-size: 0.85rem;
+}
+
+.hp4-cup-points {
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+.hp4-cup-points.negative {
+  color: #e74c3c;
+}
+.hp4-cup-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.25rem;
+}
+
+.hp4-cup-btn {
+  background: var(--house-color);
+  border: none;
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}

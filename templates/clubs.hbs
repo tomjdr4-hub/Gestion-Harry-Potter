@@ -1,0 +1,130 @@
+<div class="hp4-root">
+  {{#if (eq view "list")}}
+  <div class="hp4-clubs-list">
+    <div class="hp4-clubs-header">
+      <h2>Clubs de Poudlard</h2>
+      {{#if isGM}}
+        <button type="button" class="hp4-club-create">
+          <i class="fas fa-plus"></i> Nouveau club
+        </button>
+      {{/if}}
+    </div>
+
+    <div class="hp4-clubs-grid">
+      {{#each clubs}}
+        <div class="hp4-club-card" data-id="{{id}}">
+          <div class="hp4-club-card-name">{{name}}</div>
+          <div class="hp4-club-card-info">
+            {{#if schedule}}<span><i class="fas fa-calendar"></i> {{schedule}}</span>{{/if}}
+            <span><i class="fas fa-users"></i> {{memberCount}} membre(s)</span>
+          </div>
+          {{#if ../isGM}}
+            <button type="button" class="hp4-club-delete" data-id="{{id}}" title="Supprimer">
+              <i class="fas fa-trash"></i>
+            </button>
+          {{/if}}
+        </div>
+      {{else}}
+        <p class="hp4-empty">Aucun club pour l'instant.{{#if isGM}} Créez-en un !{{/if}}</p>
+      {{/each}}
+    </div>
+  </div>
+
+  {{else}}
+  <div class="hp4-club-detail">
+    <div class="hp4-club-detail-header">
+      <button type="button" class="hp4-back-btn"><i class="fas fa-arrow-left"></i> Retour</button>
+      <h2>
+        {{club.name}}
+        {{#if isGM}}
+          <button type="button" class="hp4-club-rename" title="Renommer"><i class="fas fa-pencil-alt"></i></button>
+        {{/if}}
+      </h2>
+    </div>
+
+    <div class="hp4-club-body">
+
+      <!-- Président -->
+      <section class="hp4-club-section">
+        <h3><i class="fas fa-crown"></i> Président</h3>
+        <div class="hp4-president-drop" data-hint="{{#unless isGM}}{{/unless}}">
+          {{#if club.presidentId}}
+            <div class="hp4-president-card" data-id="{{club.presidentId}}">
+              <img src="{{club.presidentImg}}" alt="{{club.presidentName}}" />
+              <span>{{club.presidentName}}</span>
+              {{#if isGM}}
+                <button type="button" class="hp4-remove-president" title="Retirer">
+                  <i class="fas fa-times"></i>
+                </button>
+              {{/if}}
+            </div>
+          {{else}}
+            <p class="hp4-empty">
+              {{#if isGM}}Glissez un acteur ici{{else}}Aucun président désigné{{/if}}
+            </p>
+          {{/if}}
+        </div>
+      </section>
+
+      <!-- Séances -->
+      <section class="hp4-club-section">
+        <h3>
+          <i class="fas fa-calendar-alt"></i> Séances
+          {{#if isGM}}
+            <button type="button" class="hp4-schedule-edit" title="Modifier"><i class="fas fa-pencil-alt"></i></button>
+          {{/if}}
+        </h3>
+        <p class="hp4-schedule-text">{{#if club.schedule}}{{club.schedule}}{{else}}<em>Non défini</em>{{/if}}</p>
+      </section>
+
+      <!-- Membres -->
+      <section class="hp4-club-section">
+        <h3><i class="fas fa-users"></i> Membres</h3>
+        <div class="hp4-members-drop hp4-actors-grid">
+          {{#each club.members}}
+            <div class="hp4-actor-card" data-id="{{id}}">
+              <img src="{{img}}" alt="{{name}}" />
+              <span>{{name}}</span>
+              {{#if ../isGM}}
+                <button type="button" class="hp4-remove-member" data-id="{{id}}" title="Retirer">
+                  <i class="fas fa-times"></i>
+                </button>
+              {{/if}}
+            </div>
+          {{else}}
+            <p class="hp4-empty">{{#if isGM}}Glissez des acteurs ici{{else}}Aucun membre{{/if}}</p>
+          {{/each}}
+        </div>
+      </section>
+
+      <!-- Journal -->
+      <section class="hp4-club-section">
+        <h3><i class="fas fa-book"></i> Journal du club</h3>
+        <div class="hp4-club-journal">
+          {{#each club.entries}}
+            <div class="hp4-journal-entry">
+              <div class="hp4-journal-meta">
+                <span class="hp4-journal-author">{{author}}</span>
+                <span class="hp4-journal-date">{{date}}</span>
+                {{#if ../isGM}}
+                  <button type="button" class="hp4-journal-delete" data-index="{{@index}}" title="Supprimer">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                {{/if}}
+              </div>
+              <div class="hp4-journal-text">{{text}}</div>
+            </div>
+          {{else}}
+            <p class="hp4-empty">Aucune note pour l'instant.</p>
+          {{/each}}
+        </div>
+        <textarea class="hp4-journal-textarea" rows="3" placeholder="Ajouter une note..."></textarea>
+        <div class="hp4-note-actions">
+          <button type="button" class="hp4-journal-save">Ajouter</button>
+        </div>
+      </section>
+
+    </div>
+  </div>
+  {{/if}}
+</div>

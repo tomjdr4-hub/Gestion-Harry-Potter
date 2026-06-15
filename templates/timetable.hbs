@@ -1,0 +1,79 @@
+<div class="hp4-root">
+  <div class="hp4-tt-wrapper">
+
+    <!-- En-tête jours -->
+    <div class="hp4-tt-grid">
+      <div class="hp4-tt-hours-header"></div>
+      {{#each days}}
+        <div class="hp4-tt-day-header">{{label}}</div>
+      {{/each}}
+
+      <!-- Colonne heures -->
+      <div class="hp4-tt-hours">
+        {{#each hours}}
+          <div class="hp4-tt-hour-label">{{this}}</div>
+        {{/each}}
+      </div>
+
+      <!-- Colonnes jours -->
+      {{#each days}}
+        <div class="hp4-day-col" data-day="{{dayIndex}}">
+          <!-- Lignes horaires -->
+          {{#each ../hours}}
+            <div class="hp4-tt-slot"></div>
+          {{/each}}
+
+          <!-- Événements -->
+          {{#each events}}
+            <div class="hp4-event" data-id="{{id}}"
+                 style="top:{{top}}%; height:{{height}}%; background:{{color}}; border-left: 4px solid {{color}};">
+              <span class="hp4-event-title">{{title}}</span>
+<span class="hp4-event-time">{{startLabel}} – {{endLabel}}</span>
+              {{#if ../../isGM}}
+                <button type="button" class="hp4-event-delete" data-id="{{id}}" title="Supprimer">
+                  <i class="fas fa-times"></i>
+                </button>
+              {{/if}}
+            </div>
+          {{/each}}
+        </div>
+      {{/each}}
+    </div>
+
+    {{#if isGM}}
+      <p class="hp4-hint" style="margin-top:0.5rem">
+        <i class="fas fa-info-circle"></i> Cliquez sur une case vide pour ajouter un cours · Cliquez sur un cours pour le modifier
+      </p>
+    {{/if}}
+  </div>
+
+  <!-- Modale création événement -->
+  <div class="hp4-tt-modal" style="display:none">
+    <div class="hp4-tt-modal-inner">
+      <h3><i class="fas fa-calendar-plus"></i> <span class="hp4-tt-modal-title">Nouvel événement</span></h3>
+
+      <input type="hidden" id="hp4-tt-day" />
+
+      <label>Titre
+        <input type="text" id="hp4-tt-title" placeholder="ex: Cours de Botanique" />
+      </label>
+
+      <div class="hp4-tt-row">
+        <label>Début
+          <input type="time" id="hp4-tt-start" min="07:00" max="22:00" step="900" />
+        </label>
+        <label>Fin
+          <input type="time" id="hp4-tt-end" min="07:00" max="22:00" step="900" />
+        </label>
+        <label>Couleur
+          <input type="color" id="hp4-tt-color" value="#c0392b" />
+        </label>
+      </div>
+
+      <div class="hp4-note-actions">
+        <button type="button" class="hp4-tt-save">Ajouter</button>
+        <button type="button" class="hp4-tt-cancel">Annuler</button>
+      </div>
+    </div>
+  </div>
+</div>

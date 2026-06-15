@@ -1,0 +1,30 @@
+<div class="hp4-cup-wrapper">
+  <h2 class="hp4-cup-title">⚗️ Coupe des Quatre Maisons</h2>
+
+  <div class="hp4-cup-houses">
+    {{#each houses}}
+    <div class="hp4-cup-house" style="--house-color: {{color}}; --house-bg: {{bg}}">
+      <div class="hp4-cup-hourglass">
+        <div class="hp4-cup-hourglass-top">
+          <div class="hp4-cup-fill" style="height: {{percent}}%"></div>
+        </div>
+        <div class="hp4-cup-hourglass-neck"></div>
+        <div class="hp4-cup-hourglass-bottom">
+          <div class="hp4-cup-fill-bottom" style="height: {{percent}}%"></div>
+        </div>
+      </div>
+
+      <div class="hp4-cup-label">{{label}}</div>
+      <div class="hp4-cup-points {{#if negative}}negative{{/if}}">{{points}} pts</div>
+
+      {{#if ../isGM}}
+      <div class="hp4-cup-controls">
+        <button type="button" class="hp4-cup-btn" data-house="{{key}}" data-action="remove">−</button>
+<input type="number" class="hp4-points-input" data-house="{{key}}" value="10" min="1" style="width:50px; text-align:center" />
+        <button type="button" class="hp4-cup-btn" data-house="{{key}}" data-action="add">+</button>
+      </div>
+      {{/if}}
+    </div>
+    {{/each}}
+  </div>
+</div>

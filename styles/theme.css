@@ -1,0 +1,342 @@
+/* ── Google Fonts ── */
+@import url('https://fonts.googleapis.com/css2?family=MedievalSharp&family=Cinzel:wght@400;600;700&family=IM+Fell+English:ital@0;1&display=swap');
+
+/* ── Variables globales du thème ── */
+:root {
+  --hp-parchment:       #f2e8d5;
+  --hp-parchment-dark:  #e0ccaa;
+  --hp-parchment-darker:#c9a87c;
+  --hp-ink:             #2c1a0e;
+  --hp-ink-light:       #5c3d1e;
+  --hp-gold:            #c9a84c;
+  --hp-gold-dark:       #9a7a2a;
+  --hp-bordeaux:        #7b2d2d;
+  --hp-bordeaux-dark:   #4a1a1a;
+  --hp-shadow:          rgba(44, 26, 14, 0.4);
+
+  --hp-font-title:      'Cinzel', serif;
+  --hp-font-body:       'IM Fell English', serif;
+}
+
+/* ── Fenêtres ApplicationV2 ── */
+.hp4-main,
+.hp4-classes,
+.hp4-npcs,
+.hp4-house-cup,
+.hp4-clubs,
+.hp4-timetable {
+  background: var(--hp-parchment) !important;
+  color: var(--hp-ink) !important;
+  font-family: var(--hp-font-body) !important;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23noise)' opacity='0.06'/%3E%3C/svg%3E") !important;
+}
+
+/* Barre de titre Foundry */
+.hp4-main .window-title,
+.hp4-classes .window-title,
+.hp4-npcs .window-title,
+.hp4-house-cup .window-title,
+.hp4-clubs .window-title,
+.hp4-timetable .window-title {
+  font-family: var(--hp-font-title) !important;
+  color: var(--hp-gold) !important;
+  text-shadow: 1px 1px 3px var(--hp-bordeaux-dark) !important;
+  letter-spacing: 0.08em;
+}
+
+/* ── Titres internes ── */
+.hp4-main h2,
+.hp4-classes-wrapper h2,
+.hp4-clubs-header h2,
+.hp4-club-detail-header h2,
+.hp4-cup-title {
+  font-family: var(--hp-font-title) !important;
+  color: var(--hp-bordeaux) !important;
+  text-shadow: 1px 1px 0 var(--hp-parchment-dark);
+  border-bottom: 2px solid var(--hp-gold);
+  padding-bottom: 0.4rem;
+  letter-spacing: 0.05em;
+}
+
+.hp4-club-section h3,
+.hp4-house-title {
+  font-family: var(--hp-font-title) !important;
+  letter-spacing: 0.04em;
+}
+
+/* ── Boutons principaux ── */
+.hp4-tab,
+.hp4-club-create,
+.hp4-note-save,
+.hp4-tt-save,
+.hp4-journal-save,
+.hp4-back-btn,
+.hp4-year-tab {
+  font-family: var(--hp-font-title) !important;
+  font-size: 0.75rem !important;
+  letter-spacing: 0.04em;
+  border-radius: 3px !important;
+  transition: all 0.2s !important;
+}
+
+.hp4-tab,
+.hp4-year-tab {
+  background: var(--hp-parchment-dark) !important;
+  color: var(--hp-ink) !important;
+  border: 1px solid var(--hp-parchment-darker) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 1px 2px var(--hp-shadow);
+}
+
+.hp4-tab:hover,
+.hp4-year-tab:hover {
+  background: var(--hp-gold) !important;
+  color: var(--hp-ink) !important;
+  border-color: var(--hp-gold-dark) !important;
+}
+
+.hp4-year-tab.active {
+  background: var(--hp-bordeaux) !important;
+  color: var(--hp-parchment) !important;
+  border-color: var(--hp-bordeaux-dark) !important;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.4) !important;
+}
+
+.hp4-note-save,
+.hp4-tt-save,
+.hp4-journal-save,
+.hp4-club-create {
+  background: var(--hp-bordeaux) !important;
+  color: var(--hp-parchment) !important;
+  border: 1px solid var(--hp-bordeaux-dark) !important;
+  box-shadow: 0 1px 2px var(--hp-shadow);
+}
+
+.hp4-note-save:hover,
+.hp4-tt-save:hover,
+.hp4-journal-save:hover,
+.hp4-club-create:hover {
+  background: var(--hp-bordeaux-dark) !important;
+}
+
+.hp4-back-btn,
+.hp4-note-cancel,
+.hp4-tt-cancel {
+  background: var(--hp-parchment-dark) !important;
+  color: var(--hp-ink) !important;
+  border: 1px solid var(--hp-parchment-darker) !important;
+}
+
+/* ── Cartes acteurs ── */
+.hp4-actor-card img,
+.hp4-president-card img {
+  border: 2px solid var(--hp-gold) !important;
+  box-shadow: 0 2px 6px var(--hp-shadow);
+}
+
+.hp4-actor-card span {
+  color: var(--hp-ink) !important;
+  font-family: var(--hp-font-body) !important;
+  font-size: 0.72rem;
+}
+
+/* ── Zones de drop ── */
+.hp4-house-zone,
+.hp4-president-drop,
+.hp4-members-drop,
+.hp4-npc-drop {
+  border-color: var(--hp-parchment-darker) !important;
+  background: rgba(242, 232, 213, 0.4) !important;
+}
+
+.hp4-house-zone.drag-over,
+.hp4-president-drop.drag-over,
+.hp4-members-drop.drag-over,
+.hp4-npc-drop.drag-over {
+  border-color: var(--hp-gold) !important;
+  background: rgba(201, 168, 76, 0.15) !important;
+}
+
+/* ── Maisons — couleurs adaptées thème parchemin ── */
+.hp4-house-gryffondor { color: #8b1a1a !important; border-bottom-color: #8b1a1a !important; }
+.hp4-house-serdaigle  { color: #1a3a6b !important; border-bottom-color: #1a3a6b !important; }
+.hp4-house-poufsouffle{ color: #7a5c00 !important; border-bottom-color: #7a5c00 !important; }
+.hp4-house-serpentard { color: #1a5c2a !important; border-bottom-color: #1a5c2a !important; }
+
+/* ── Clubs ── */
+.hp4-club-card {
+  background: var(--hp-parchment-dark) !important;
+  border: 1px solid var(--hp-parchment-darker) !important;
+  box-shadow: 2px 2px 6px var(--hp-shadow);
+}
+
+.hp4-club-card:hover {
+  border-color: var(--hp-gold) !important;
+  background: var(--hp-parchment) !important;
+}
+
+.hp4-club-card-name {
+  color: var(--hp-bordeaux) !important;
+  font-family: var(--hp-font-title) !important;
+}
+
+.hp4-club-card-info {
+  color: var(--hp-ink-light) !important;
+}
+
+.hp4-club-section {
+  border-color: var(--hp-parchment-darker) !important;
+  background: rgba(242, 232, 213, 0.3);
+}
+
+/* ── Journal / notes ── */
+.hp4-journal-entry {
+  background: var(--hp-parchment-dark) !important;
+  border: 1px solid var(--hp-parchment-darker) !important;
+}
+
+.hp4-journal-author {
+  color: var(--hp-bordeaux) !important;
+  font-family: var(--hp-font-title) !important;
+  font-size: 0.72rem !important;
+}
+
+.hp4-journal-date {
+  color: var(--hp-ink-light) !important;
+}
+
+.hp4-journal-text {
+  color: var(--hp-ink) !important;
+  font-family: var(--hp-font-body) !important;
+}
+
+.hp4-note-modal-inner,
+.hp4-tt-modal-inner {
+  background: var(--hp-parchment) !important;
+  border: 2px solid var(--hp-gold) !important;
+  box-shadow: 0 4px 20px var(--hp-shadow);
+}
+
+.hp4-note-modal-inner h3,
+.hp4-tt-modal-inner h3 {
+  font-family: var(--hp-font-title) !important;
+  color: var(--hp-bordeaux) !important;
+  border-bottom-color: var(--hp-gold) !important;
+}
+
+.hp4-note-textarea,
+.hp4-journal-textarea,
+.hp4-tt-modal-inner input[type="text"],
+.hp4-tt-modal-inner input[type="time"] {
+  background: var(--hp-parchment-dark) !important;
+  color: var(--hp-ink) !important;
+  border-color: var(--hp-parchment-darker) !important;
+  font-family: var(--hp-font-body) !important;
+}
+
+/* ── Coupe des maisons ── */
+.hp4-cup-wrapper {
+  background: var(--hp-parchment) !important;
+}
+
+.hp4-cup-label {
+  font-family: var(--hp-font-title) !important;
+}
+
+.hp4-cup-points {
+  font-family: var(--hp-font-title) !important;
+  color: var(--hp-ink) !important;
+}
+
+.hp4-cup-points.negative {
+  color: var(--hp-bordeaux) !important;
+}
+
+/* ── Emploi du temps ── */
+.hp4-tt-day-header {
+  background: var(--hp-parchment-dark) !important;
+  color: var(--hp-bordeaux) !important;
+  font-family: var(--hp-font-title) !important;
+  border-color: var(--hp-parchment-darker) !important;
+}
+
+.hp4-tt-hour-label {
+  color: var(--hp-ink-light) !important;
+  font-family: var(--hp-font-body) !important;
+}
+
+.hp4-tt-grid {
+  border-color: var(--hp-parchment-darker) !important;
+}
+
+.hp4-day-col {
+  background: rgba(242, 232, 213, 0.2);
+  border-color: var(--hp-parchment-darker) !important;
+}
+
+.hp4-tt-slot {
+  border-bottom-color: rgba(201, 168, 76, 0.15) !important;
+}
+
+.hp4-event {
+  font-family: var(--hp-font-body) !important;
+  box-shadow: 1px 2px 4px var(--hp-shadow) !important;
+  opacity: 1 !important;
+}
+
+/* ── Sidebar bouton ── */
+.hp4-sidebar-tab {
+  color: var(--hp-gold) !important;
+}
+
+/* ── Textes divers ── */
+.hp4-hint {
+  color: var(--hp-ink-light) !important;
+  font-style: italic;
+  font-family: var(--hp-font-body) !important;
+}
+
+.hp4-empty {
+  color: var(--hp-ink-light) !important;
+  font-style: italic;
+  font-family: var(--hp-font-body) !important;
+}
+
+.hp4-schedule-text {
+  color: var(--hp-ink) !important;
+  font-family: var(--hp-font-body) !important;
+}
+
+/* ── Décoration : bordure dorée sur les fenêtres ── */
+.app.hp4-main,
+.app.hp4-classes,
+.app.hp4-npcs,
+.app.hp4-house-cup,
+.app.hp4-clubs,
+.app.hp4-timetable {
+  border: 2px solid var(--hp-gold) !important;
+  box-shadow: 0 0 20px rgba(201, 168, 76, 0.2), 0 4px 20px rgba(0,0,0,0.5) !important;
+}
+
+/* ── Scrollbars thématiques ── */
+.hp4-club-body::-webkit-scrollbar,
+.hp4-note-journal::-webkit-scrollbar,
+.hp4-club-journal::-webkit-scrollbar,
+.hp4-tt-grid::-webkit-scrollbar {
+  width: 6px;
+}
+
+.hp4-club-body::-webkit-scrollbar-track,
+.hp4-note-journal::-webkit-scrollbar-track,
+.hp4-club-journal::-webkit-scrollbar-track,
+.hp4-tt-grid::-webkit-scrollbar-track {
+  background: var(--hp-parchment-dark);
+}
+
+.hp4-club-body::-webkit-scrollbar-thumb,
+.hp4-note-journal::-webkit-scrollbar-thumb,
+.hp4-club-journal::-webkit-scrollbar-thumb,
+.hp4-tt-grid::-webkit-scrollbar-thumb {
+  background: var(--hp-gold-dark);
+  border-radius: 3px;
+}

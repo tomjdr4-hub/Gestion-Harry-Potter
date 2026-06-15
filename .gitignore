@@ -1,0 +1,24 @@
+# Foundry / OS
+.DS_Store
+Thumbs.db
+
+# VSCode
+.vscode/
+
+# Logs
+*.log
+
+# Node (au cas où)
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Claude Code
+.claude/
+
+# Builds
+dist/
+build/
+*.zip
+

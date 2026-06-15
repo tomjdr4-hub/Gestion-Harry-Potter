@@ -1,0 +1,217 @@
+.hp4-tt-wrapper {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0.5rem;
+}
+
+.hp4-tt-grid {
+  display: grid;
+  grid-template-columns: 40px repeat(7, 1fr);
+  grid-template-rows: 32px 1fr;
+  flex: 1;
+  overflow-y: auto;
+  gap: 0;
+  border: 1px solid #333;
+  border-radius: 6px;
+}
+
+/* En-têtes */
+.hp4-tt-hours-header {
+  grid-column: 1;
+  grid-row: 1;
+  background: #1a1a1a;
+  border-right: 1px solid #333;
+  border-bottom: 1px solid #333;
+}
+
+.hp4-tt-day-header {
+  background: #1a1a1a;
+  border-bottom: 1px solid #333;
+  border-right: 1px solid #2a2a2a;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: #c9a84c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  grid-row: 1;
+}
+
+/* Colonne heures */
+.hp4-tt-hours {
+  grid-column: 1;
+  grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #333;
+}
+
+.hp4-tt-hour-label {
+  flex: 1;
+  font-size: 0.65rem;
+  color: #666;
+  text-align: right;
+  padding-right: 4px;
+  border-bottom: 1px solid #2a2a2a;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding-top: 2px;
+}
+
+/* Colonnes jours */
+.hp4-day-col {
+  grid-row: 2;
+  position: relative;
+  border-right: 1px solid #2a2a2a;
+  cursor: crosshair;
+  min-height: 600px;
+}
+
+.hp4-tt-slot {
+  height: calc(100% / 16);
+  border-bottom: 1px solid #1e1e1e;
+  box-sizing: border-box;
+}
+
+/* Événements */
+.hp4-event {
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  border-radius: 4px;
+  padding: 3px 5px;
+  font-size: 0.7rem;
+  overflow: hidden;
+  color: white;
+  opacity: 0.9;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+  z-index: 1;
+}
+
+.hp4-event-title {
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hp4-event-time {
+  font-size: 0.6rem;
+  opacity: 0.85;
+}
+
+.hp4-event-delete {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: rgba(0,0,0,0.4);
+  border: none;
+  color: white;
+  border-radius: 50%;
+  width: 14px;
+  height: 14px;
+  font-size: 0.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.hp4-event:hover .hp4-event-delete {
+  opacity: 1;
+}
+
+/* Modale */
+.hp4-tt-modal {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.hp4-tt-modal-inner {
+  background: #1a1a1a;
+  border: 1px solid #555;
+  border-radius: 8px;
+  padding: 1rem;
+  width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.hp4-tt-modal-inner h3 {
+  margin: 0;
+  font-size: 1rem;
+  border-bottom: 1px solid #333;
+  padding-bottom: 0.5rem;
+}
+
+.hp4-tt-modal-inner label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.8rem;
+  color: #aaa;
+}
+
+.hp4-tt-modal-inner input[type="text"],
+.hp4-tt-modal-inner input[type="time"] {
+  background: #111;
+  color: #ddd;
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 0.3rem 0.5rem;
+  font-family: inherit;
+  font-size: 0.85rem;
+}
+
+.hp4-tt-modal-inner input[type="color"] {
+  width: 100%;
+  height: 32px;
+  border: 1px solid #444;
+  border-radius: 4px;
+  background: none;
+  cursor: pointer;
+  padding: 1px;
+}
+
+.hp4-tt-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.hp4-tt-row label {
+  flex: 1;
+}
+
+.hp4-tt-save {
+  background: #7b2d2d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.3rem 0.75rem;
+  cursor: pointer;
+}
+
+.hp4-tt-cancel {
+  background: #333;
+  color: #ccc;
+  border: none;
+  border-radius: 4px;
+  padding: 0.3rem 0.75rem;
+  cursor: pointer;
+}

@@ -1,0 +1,16 @@
+.hp4-npcs-wrapper {
+  padding: 0.75rem;
+}
+
+.hp4-npc-drop {
+  min-height: 200px;
+  border: 2px dashed #444;
+  border-radius: 6px;
+  padding: 0.75rem;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.hp4-npc-drop.drag-over {
+  border-color: #a84444;
+  background: rgba(168, 68, 68, 0.1);
+}

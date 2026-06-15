@@ -1,0 +1,42 @@
+<div class="hp4-root">
+  <div class="hp4-npcs-wrapper">
+    {{#if isGM}}
+      <p class="hp4-hint"><i class="fas fa-info-circle"></i> Glissez des acteurs depuis le répertoire</p>
+    {{/if}}
+
+    <div class="hp4-npc-drop hp4-actors-grid">
+      {{#each npcs}}
+        <div class="hp4-actor-card" data-id="{{id}}">
+          <img src="{{img}}" alt="{{name}}" />
+          <span>{{name}}</span>
+          {{#if ../isGM}}
+            <button type="button" class="hp4-remove-actor" title="Retirer">
+              <i class="fas fa-times"></i>
+            </button>
+          {{/if}}
+          <button type="button" class="hp4-note-btn" data-id="{{id}}" title="Journal">
+            <i class="fas fa-book"></i>
+            {{#if entries.length}}
+              <span class="hp4-note-count">{{entries.length}}</span>
+            {{/if}}
+          </button>
+        </div>
+      {{else}}
+        <p class="hp4-empty">Aucun PNJ rencontré pour l'instant.</p>
+      {{/each}}
+    </div>
+  </div>
+
+  <!-- Modal journal -->
+  <div class="hp4-note-modal" style="display:none">
+    <div class="hp4-note-modal-inner">
+      <h3><i class="fas fa-book"></i> Journal — <span class="hp4-note-actor-name"></span></h3>
+      <div class="hp4-note-journal"></div>
+      <textarea class="hp4-note-textarea" rows="3" placeholder="Ajouter une note..."></textarea>
+      <div class="hp4-note-actions">
+        <button type="button" class="hp4-note-save">Ajouter</button>
+        <button type="button" class="hp4-note-cancel">Fermer</button>
+      </div>
+    </div>
+  </div>
+</div>
