@@ -33,12 +33,14 @@ export class HouseCupApp extends HandlebarsApplicationMixin(ApplicationV2) {
   async _prepareContext() {
     const points = HouseCupApp.getPoints();
     const total = Math.max(Object.values(points).reduce((s, v) => s + Math.max(v ?? 0, 0), 0), 1);
+    const maxPoints = Math.max(...HOUSES.map(h => points[h.key] ?? 0));
 
     const houses = HOUSES.map(h => ({
       ...h,
       points: points[h.key] ?? 0,
-      percent: Math.round(((points[h.key] ?? 0) / total) * 100),
-      negative: (points[h.key] ?? 0) < 0,  // ← géré ici
+      percent: Math.round((Math.max(points[h.key] ?? 0, 0) / total) * 100),
+      negative: (points[h.key] ?? 0) < 0,
+      isLeading: maxPoints > 0 && (points[h.key] ?? 0) === maxPoints,
     }));
 
     return { houses, isGM: game.user.isGM };

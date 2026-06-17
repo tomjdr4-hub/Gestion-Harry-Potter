@@ -1,27 +1,28 @@
 <div class="hp4-cup-wrapper">
-  <h2 class="hp4-cup-title">⚗️ Coupe des Quatre Maisons</h2>
+  <h2 class="hp4-cup-title"><i class="fas fa-trophy"></i> Coupe des Quatre Maisons</h2>
 
   <div class="hp4-cup-houses">
     {{#each houses}}
-    <div class="hp4-cup-house" style="--house-color: {{color}}; --house-bg: {{bg}}">
-      <div class="hp4-cup-hourglass">
-        <div class="hp4-cup-hourglass-top">
-          <div class="hp4-cup-fill" style="height: {{percent}}%"></div>
-        </div>
-        <div class="hp4-cup-hourglass-neck"></div>
-        <div class="hp4-cup-hourglass-bottom">
-          <div class="hp4-cup-fill-bottom" style="height: {{percent}}%"></div>
-        </div>
+    <div class="hp4-cup-house {{#if isLeading}}hp4-cup-leader{{/if}}" style="--hc: {{color}}">
+      {{#if isLeading}}
+        <div class="hp4-cup-crown"><i class="fas fa-crown"></i></div>
+      {{/if}}
+      <div class="hp4-cup-icon"><i class="{{icon}}"></i></div>
+      <div class="hp4-cup-name">{{label}}</div>
+      <div class="hp4-cup-score {{#if negative}}hp4-negative{{/if}}">{{points}}</div>
+      <div class="hp4-cup-score-label">points</div>
+      <div class="hp4-cup-bar-track">
+        <div class="hp4-cup-bar-fill" style="width: {{percent}}%"></div>
       </div>
-
-      <div class="hp4-cup-label">{{label}}</div>
-      <div class="hp4-cup-points {{#if negative}}negative{{/if}}">{{points}} pts</div>
-
       {{#if ../isGM}}
       <div class="hp4-cup-controls">
-        <button type="button" class="hp4-cup-btn" data-house="{{key}}" data-action="remove">−</button>
-<input type="number" class="hp4-points-input" data-house="{{key}}" value="10" min="1" style="width:50px; text-align:center" />
-        <button type="button" class="hp4-cup-btn" data-house="{{key}}" data-action="add">+</button>
+        <button type="button" class="hp4-cup-btn" data-house="{{key}}" data-action="remove">
+          <i class="fas fa-minus"></i>
+        </button>
+        <input type="number" class="hp4-points-input" data-house="{{key}}" value="10" min="1" />
+        <button type="button" class="hp4-cup-btn" data-house="{{key}}" data-action="add">
+          <i class="fas fa-plus"></i>
+        </button>
       </div>
       {{/if}}
     </div>
