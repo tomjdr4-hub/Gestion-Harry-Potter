@@ -47,6 +47,9 @@ Hooks.once("init", function () {
   game.settings.register(MODULE_ID, "clubs-data", {
     scope: "world", config: false, type: Object, default: {}
   });
+  game.settings.register(MODULE_ID, "school-year", {
+    scope: "world", config: false, type: String, default: ""
+  });
 });
 
 Hooks.once("ready", function () {

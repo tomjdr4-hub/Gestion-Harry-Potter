@@ -38,6 +38,35 @@ export class ClassesApp extends HandlebarsApplicationMixin(ApplicationV2) {
     await game.settings.set(MODULE_ID, "classes-data", data);
   }
 
+  static getSchoolYear() {
+    try { return game.settings.get(MODULE_ID, "school-year") ?? ""; }
+    catch { return ""; }
+  }
+
+  static async saveSchoolYear(year) {
+    await game.settings.set(MODULE_ID, "school-year", year);
+  }
+
+  static nextSchoolYear(current) {
+    const match = current.match(/^(\d{4})-(\d{4})$/);
+    if (!match) return current;
+    return `${parseInt(match[1]) + 1}-${parseInt(match[2]) + 1}`;
+  }
+
+  static shiftYearData(classData) {
+    const houseKeys = HOUSES.map(h => h.key);
+    const shifted = { ...classData };
+    for (let y = 7; y >= 2; y--) {
+      for (const house of houseKeys) {
+        shifted[`year-${y}-${house}`] = classData[`year-${y - 1}-${house}`] ?? [];
+      }
+    }
+    for (const house of houseKeys) {
+      shifted[`year-1-${house}`] = [];
+    }
+    return shifted;
+  }
+
   async _prepareContext() {
     const classData = ClassesApp.getClassData();
     const isGM = game.user.isGM;
@@ -57,7 +86,7 @@ export class ClassesApp extends HandlebarsApplicationMixin(ApplicationV2) {
       return { label, yearKey, actors };
     });
 
-    return { years, houses: HOUSES, isGM, actorNotes };
+    return { years, houses: HOUSES, isGM, actorNotes, schoolYear: ClassesApp.getSchoolYear() };
   }
 
   _onRender(context, options) {
@@ -99,6 +128,51 @@ export class ClassesApp extends HandlebarsApplicationMixin(ApplicationV2) {
     registerNoteModal(this);
 
     if (!game.user.isGM) return;
+
+    // Modifier l'année scolaire
+    this.element.querySelector(".hp4-edit-year-btn")?.addEventListener("click", async () => {
+      const current = ClassesApp.getSchoolYear();
+      const newYear = await foundry.applications.api.DialogV2.wait({
+        window: { title: "Année scolaire" },
+        content: `<label style="font-size:0.85rem">Année scolaire
+          <input type="text" id="hp4-year-input" value="${current.replace(/"/g, "&quot;")}"
+            placeholder="ex: 1992-1993" style="width:100%;margin-top:0.4rem">
+        </label>`,
+        buttons: [
+          { action: "ok", label: "Valider", default: true, callback: () => document.getElementById("hp4-year-input")?.value.trim() ?? "" },
+          { action: "cancel", label: "Annuler", callback: () => null }
+        ],
+        rejectClose: false
+      });
+      if (newYear === null) return;
+      await ClassesApp.saveSchoolYear(newYear);
+      this.render();
+    });
+
+    // Passer à la nouvelle année scolaire
+    this.element.querySelector(".hp4-advance-year-btn")?.addEventListener("click", async () => {
+      const current = ClassesApp.getSchoolYear();
+      const next = ClassesApp.nextSchoolYear(current);
+      const yearLine = next ? `<p>Nouvelle année scolaire : <strong>${next}</strong></p>` : "";
+      const confirmed = await foundry.applications.api.DialogV2.confirm({
+        window: { title: "Nouvelle année scolaire" },
+        content: `
+          <p>Cette action va :</p>
+          <ul style="margin:0.4rem 0 0.4rem 1.2rem">
+            <li>Faire passer tous les élèves en classe supérieure</li>
+            <li>Retirer les élèves de 7ème année (diplômés)</li>
+            <li>Vider les classes de 1ère année</li>
+          </ul>
+          ${yearLine}
+          <p><strong>Cette action est irréversible.</strong></p>`,
+      });
+      if (!confirmed) return;
+      const shifted = ClassesApp.shiftYearData(ClassesApp.getClassData());
+      await ClassesApp.saveClassData(shifted);
+      if (next) await ClassesApp.saveSchoolYear(next);
+      this.#activeYearIndex = 0;
+      this.render();
+    });
 
     // Rendre les cartes existantes draggables
     this.element.querySelectorAll(".hp4-actor-card[draggable='true']").forEach(card => {

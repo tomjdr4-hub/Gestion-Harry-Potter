@@ -1,5 +1,20 @@
 <div class="hp4-root">
   <div class="hp4-classes-wrapper">
+    {{#if isGM}}
+    <div class="hp4-classes-header">
+      <span class="hp4-school-year-label">
+        <i class="fas fa-graduation-cap"></i>
+        {{#if schoolYear}}{{schoolYear}}{{else}}<em>Année scolaire non définie</em>{{/if}}
+      </span>
+      <button type="button" class="hp4-edit-year-btn" title="Modifier l'année scolaire">
+        <i class="fas fa-pen"></i>
+      </button>
+      <button type="button" class="hp4-advance-year-btn" title="Passer à l'année suivante">
+        <i class="fas fa-forward-step"></i> Nouvelle année
+      </button>
+    </div>
+    {{/if}}
+
     <nav class="hp4-year-tabs">
       {{#each years}}
         <button type="button" class="hp4-year-tab" data-year="{{yearKey}}">{{label}}</button>
