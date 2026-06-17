@@ -8,6 +8,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -15,12 +17,11 @@ jobs:
       - name: Zip module
         run: |
           set -e
-          # Crée un zip compatible Foundry : le contenu du zip doit être le dossier du module (celui qui contient module.json)
           mkdir -p dist
-          zip -r dist/gestion-harry-potter.zip . -x "dist/*" 
+          zip -r dist/gestion-harry-potter.zip . \
+            -x "dist/*" -x ".git/*" -x ".github/*"
 
-      - name: Create GitHub Release asset
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: dist/gestion-harry-potter.zip
-
