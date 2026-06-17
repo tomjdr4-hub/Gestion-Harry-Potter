@@ -8,19 +8,27 @@
       <div class="hp4-fiche-name">{{actor.name}}</div>
     </div>
 
-    <div class="hp4-fiche-section">
-      <div class="hp4-fiche-label">Relation</div>
-      <div class="hp4-rel-bar">
-        {{#each relations}}
-          <button type="button"
-                  class="hp4-rel-btn{{#if active}} active{{/if}}"
-                  data-rel="{{key}}"
-                  style="--rc: {{color}}"
-                  title="{{label}}">
-            {{label}}
-          </button>
-        {{/each}}
-      </div>
+    <div class="hp4-fiche-relations">
+      {{#each relations}}
+        <div class="hp4-rel-row" style="--rc: {{color}}">
+          <div class="hp4-rel-label">{{label}}</div>
+          <div class="hp4-rel-drop" data-rel="{{key}}">
+            {{#each actors}}
+              <div class="hp4-rel-actor" title="{{name}}">
+                <img src="{{img}}" alt="{{name}}" />
+                <button type="button" class="hp4-rel-remove"
+                        data-actor-id="{{id}}"
+                        data-rel="{{../key}}"
+                        title="Retirer">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            {{else}}
+              <span class="hp4-rel-hint">Glissez un acteur ici</span>
+            {{/each}}
+          </div>
+        </div>
+      {{/each}}
     </div>
 
     <div class="hp4-fiche-section hp4-fiche-section--grow">

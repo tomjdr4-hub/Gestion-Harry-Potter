@@ -23,7 +23,7 @@ export class FicheApp extends HandlebarsApplicationMixin(ApplicationV2) {
   static DEFAULT_OPTIONS = {
     classes: ["hp4-fiche"],
     window: { title: "Fiche d'identité", resizable: true },
-    position: { width: 340, height: 500 },
+    position: { width: 440, height: 640 },
   };
 
   static PARTS = {
@@ -63,9 +63,15 @@ export class FicheApp extends HandlebarsApplicationMixin(ApplicationV2) {
     const actor = game.actors.get(this.#actorId);
     const profiles = FicheApp.getProfiles();
     const profile = profiles[this.#actorId] ?? {};
-    const currentRel = profile.relation ?? "neutre";
 
-    const relations = RELATIONS.map(r => ({ ...r, active: r.key === currentRel }));
+    const relations = RELATIONS.map(r => {
+      const ids = profile[r.key] ?? [];
+      const actors = ids
+        .map(id => game.actors.get(id))
+        .filter(Boolean)
+        .map(a => ({ id: a.id, name: a.name, img: a.img }));
+      return { ...r, actors };
+    });
 
     return {
       actor: actor ? { id: actor.id, name: actor.name, img: actor.img } : null,
@@ -87,25 +93,56 @@ export class FicheApp extends HandlebarsApplicationMixin(ApplicationV2) {
       new ImagePopout(actor.img, { title: actor.name, shareable: true, uuid: actor.uuid }).render(true);
     });
 
-    // Relation — clic sur un niveau
-    this.element.querySelectorAll(".hp4-rel-btn").forEach(btn => {
-      btn.addEventListener("click", async () => {
+    // Zones de dépôt des niveaux de relation
+    this.element.querySelectorAll(".hp4-rel-drop").forEach(zone => {
+      zone.addEventListener("dragover", e => {
+        e.preventDefault();
+        zone.classList.add("drag-over");
+      });
+      zone.addEventListener("dragleave", e => {
+        if (!zone.contains(e.relatedTarget)) zone.classList.remove("drag-over");
+      });
+      zone.addEventListener("drop", async e => {
+        e.preventDefault();
+        zone.classList.remove("drag-over");
+        let data;
+        try { data = JSON.parse(e.dataTransfer.getData("text/plain")); } catch { return; }
+        if (data.type !== "Actor") return;
+        const droppedId = data.uuid?.split(".").pop() ?? data.id;
+        if (!droppedId || droppedId === actorId) return;
+        const rel = zone.dataset.rel;
         const profiles = FicheApp.getProfiles();
-        profiles[actorId] ??= { relation: "neutre", notes: "" };
-        profiles[actorId].relation = btn.dataset.rel;
+        profiles[actorId] ??= {};
+        // Retirer de tous les niveaux (un acteur ne peut être que dans un seul)
+        for (const r of RELATIONS) {
+          profiles[actorId][r.key] = (profiles[actorId][r.key] ?? []).filter(id => id !== droppedId);
+        }
+        profiles[actorId][rel] = [...(profiles[actorId][rel] ?? []), droppedId];
         await FicheApp.saveProfiles(profiles);
         this.render();
       });
     });
 
-    // Notes — auto-sauvegarde avec debounce 1 s
+    // Boutons retirer un acteur d'un niveau
+    this.element.querySelectorAll(".hp4-rel-remove").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const { actorId: targetId, rel } = btn.dataset;
+        const profiles = FicheApp.getProfiles();
+        profiles[actorId] ??= {};
+        profiles[actorId][rel] = (profiles[actorId][rel] ?? []).filter(id => id !== targetId);
+        await FicheApp.saveProfiles(profiles);
+        this.render();
+      });
+    });
+
+    // Notes — auto-sauvegarde debounce 1 s
     const textarea = this.element.querySelector(".hp4-fiche-notes");
     if (textarea) {
       textarea.addEventListener("input", () => {
         clearTimeout(this.#saveTimeout);
         this.#saveTimeout = setTimeout(async () => {
           const profiles = FicheApp.getProfiles();
-          profiles[actorId] ??= { relation: "neutre", notes: "" };
+          profiles[actorId] ??= {};
           profiles[actorId].notes = textarea.value;
           await FicheApp.saveProfiles(profiles);
         }, 1000);
