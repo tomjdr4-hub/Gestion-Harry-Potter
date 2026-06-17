@@ -71,11 +71,12 @@
 
 /* ── Icône ────────────────────────────────────────────────────────────── */
 
-.hp4-cup-icon {
-  font-size: 2.4rem;
-  color: var(--hc);
-  margin: 0.2rem 0 0.5rem;
-  line-height: 1;
+.hp4-sablier {
+  width: 44px;
+  height: 92px;
+  margin: 0.3rem 0 0.4rem;
+  display: block;
+  overflow: visible;
 }
 
 /* ── Nom ──────────────────────────────────────────────────────────────── */

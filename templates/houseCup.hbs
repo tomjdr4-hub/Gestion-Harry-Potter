@@ -3,11 +3,189 @@
 
   <div class="hp4-cup-houses">
     {{#each houses}}
-    <div class="hp4-cup-house {{#if isLeading}}hp4-cup-leader{{/if}}" style="--hc: {{color}}">
+    <div class="hp4-cup-house {{#if isLeading}}hp4-cup-leader{{/if}}" style="--hc: {{color}}" data-house="{{key}}">
       {{#if isLeading}}
         <div class="hp4-cup-crown"><i class="fas fa-crown"></i></div>
       {{/if}}
-      <div class="hp4-cup-icon"><i class="{{icon}}"></i></div>
+
+      {{!-- Sablier animé (gems colorées par maison via --gc) --}}
+      <svg class="hp4-sablier" data-house="{{key}}"
+           xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 125"
+           style="--gc: {{color}}">
+        <defs>
+          <style>
+            @keyframes hp4-gem-pulse {
+              0%,100% { filter: brightness(1) saturate(1); }
+              40%,60% { filter: brightness(2) saturate(1.6)
+                               drop-shadow(0 0 6px var(--gc,#c9a84c)); }
+            }
+            @keyframes hp4-grain-drop {
+              0%   { transform: translateY(-7px); opacity: 0; }
+              15%  { opacity: 0.9; }
+              85%  { opacity: 0.9; }
+              100% { transform: translateY(7px);  opacity: 0; }
+            }
+            @keyframes hp4-rock {
+              0%,100% { transform: rotate(0deg);  }
+              28%     { transform: rotate(-5deg); }
+              72%     { transform: rotate( 5deg); }
+            }
+            .hp4-flowing .hp4-gems-g {
+              animation: hp4-gem-pulse 0.55s ease-in-out 3 forwards;
+            }
+            .hp4-flowing .hp4-gr {
+              animation: hp4-grain-drop 0.4s linear 3 forwards;
+            }
+            .hp4-flowing .hp4-gr.g2 { animation-delay: 0.13s; }
+            .hp4-flowing .hp4-gr.g3 { animation-delay: 0.26s; }
+            .hp4-flowing {
+              animation: hp4-rock 1.65s ease-in-out 1;
+              transform-box: fill-box;
+              transform-origin: center;
+            }
+          </style>
+
+          {{!-- ── Gradients (IDs uniques par maison via {{key}}) ── --}}
+          <linearGradient id="hg-cap-{{key}}" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%"   stop-color="#f0e070"/>
+            <stop offset="40%"  stop-color="#c9a84c"/>
+            <stop offset="100%" stop-color="#7a5010"/>
+          </linearGradient>
+          <linearGradient id="hg-pil-{{key}}" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%"   stop-color="#5a3808"/>
+            <stop offset="38%"  stop-color="#e0c050"/>
+            <stop offset="62%"  stop-color="#f0e070"/>
+            <stop offset="100%" stop-color="#5a3808"/>
+          </linearGradient>
+          <radialGradient id="hg-glass-{{key}}" cx="32%" cy="28%" r="75%">
+            <stop offset="0%"   stop-color="rgba(255,255,255,0)"/>
+            <stop offset="72%"  stop-color="rgba(185,215,255,0.08)"/>
+            <stop offset="100%" stop-color="rgba(255,255,255,0.3)"/>
+          </radialGradient>
+          <radialGradient id="hg-gems-{{key}}" cx="34%" cy="24%" r="82%">
+            <stop offset="0%"   stop-color="var(--gc,#c9a84c)" stop-opacity="1"/>
+            <stop offset="68%"  stop-color="var(--gc,#c9a84c)" stop-opacity="0.78"/>
+            <stop offset="100%" stop-color="rgba(0,0,0,0.7)"/>
+          </radialGradient>
+          <radialGradient id="hg-hi-{{key}}" cx="50%" cy="50%" r="50%">
+            <stop offset="0%"   stop-color="rgba(255,255,255,0.6)"/>
+            <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+          </radialGradient>
+
+          {{!-- ── Filtres ── --}}
+          <filter id="hf-tex-{{key}}" x="-5%" y="-5%" width="110%" height="110%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.14 0.1"
+                          numOctaves="3" seed="{{@index}}" result="n"/>
+            <feDisplacementMap in="SourceGraphic" in2="n"
+                               scale="5" xChannelSelector="R" yChannelSelector="G"/>
+          </filter>
+          <filter id="hf-bl-{{key}}" x="-40%" y="-40%" width="180%" height="180%">
+            <feGaussianBlur stdDeviation="2.8"/>
+          </filter>
+          <filter id="hf-bs-{{key}}" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="1.3"/>
+          </filter>
+          <filter id="hf-gld-{{key}}" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="1.8" result="b"/>
+            <feColorMatrix in="b"
+              values="1.4 0.8 0 0 0  0.7 0.5 0 0 0  0 0 0 0 0  0 0 0 0.4 0"
+              result="glow"/>
+            <feMerge><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+
+          {{!-- ── Clips ── --}}
+          <clipPath id="hc-top-{{key}}"><circle cx="30" cy="35" r="21"/></clipPath>
+          <clipPath id="hc-bot-{{key}}"><circle cx="30" cy="89" r="21"/></clipPath>
+        </defs>
+
+        {{!-- Piliers --}}
+        <rect x="3"  y="10" width="4.5" height="104" rx="1.5" fill="url(#hg-pil-{{key}})"/>
+        <rect x="52.5" y="10" width="4.5" height="104" rx="1.5" fill="url(#hg-pil-{{key}})"/>
+        <rect x="3"   y="34" width="4.5" height="1.5" fill="#f0e070" opacity="0.75"/>
+        <rect x="3"   y="62" width="4.5" height="1.5" fill="#f0e070" opacity="0.75"/>
+        <rect x="3"   y="90" width="4.5" height="1.5" fill="#f0e070" opacity="0.75"/>
+        <rect x="52.5" y="34" width="4.5" height="1.5" fill="#f0e070" opacity="0.75"/>
+        <rect x="52.5" y="62" width="4.5" height="1.5" fill="#f0e070" opacity="0.75"/>
+        <rect x="52.5" y="90" width="4.5" height="1.5" fill="#f0e070" opacity="0.75"/>
+
+        {{!-- Bol supérieur --}}
+        <circle cx="30" cy="35" r="21" fill="#04060d"/>
+        <g class="hp4-gems-g" clip-path="url(#hc-top-{{key}})">
+          <rect x="9" y="14" width="42" height="42"
+                fill="url(#hg-gems-{{key}})" filter="url(#hf-tex-{{key}})"/>
+          <circle cx="20" cy="27" r="2"   fill="url(#hg-hi-{{key}})" opacity="0.5"
+                  filter="url(#hf-bs-{{key}})"/>
+          <circle cx="38" cy="23" r="1.5" fill="url(#hg-hi-{{key}})" opacity="0.4"
+                  filter="url(#hf-bs-{{key}})"/>
+        </g>
+        <circle cx="30" cy="35" r="21"
+                fill="url(#hg-glass-{{key}})" stroke="#9a7020" stroke-width="1.2"/>
+        <ellipse cx="21" cy="26" rx="9"   ry="6.5"
+                 fill="white" opacity="0.25" filter="url(#hf-bl-{{key}})"/>
+        <ellipse cx="18" cy="23" rx="4.5" ry="3.2"
+                 fill="white" opacity="0.45" filter="url(#hf-bs-{{key}})"/>
+        <circle  cx="15" cy="21" r="1.5" fill="white" opacity="0.72"/>
+
+        {{!-- Col (tube de verre) --}}
+        <rect x="26" y="56" width="8" height="14" rx="1" fill="#04060d"/>
+        <rect x="26" y="56" width="8" height="14" rx="1"
+              fill="url(#hg-glass-{{key}})" stroke="#9a7020" stroke-width="0.6"/>
+        <rect x="27" y="57" width="2" height="12" rx="0.5" fill="white" opacity="0.2"/>
+        <rect x="22" y="52" width="16" height="5" rx="2.5"
+              fill="url(#hg-cap-{{key}})" filter="url(#hf-gld-{{key}})"/>
+        <rect x="22" y="69" width="16" height="5" rx="2.5"
+              fill="url(#hg-cap-{{key}})" filter="url(#hf-gld-{{key}})"/>
+
+        {{!-- Grains animés (invisibles au repos) --}}
+        <circle class="hp4-gr"    cx="30" cy="63" r="0.9"
+                fill="var(--gc,#c9a84c)" opacity="0"/>
+        <circle class="hp4-gr g2" cx="30" cy="63" r="0.9"
+                fill="var(--gc,#c9a84c)" opacity="0"/>
+        <circle class="hp4-gr g3" cx="30" cy="63" r="0.9"
+                fill="var(--gc,#c9a84c)" opacity="0"/>
+
+        {{!-- Bol inférieur --}}
+        <circle cx="30" cy="89" r="21" fill="#04060d"/>
+        <g class="hp4-gems-g" clip-path="url(#hc-bot-{{key}})">
+          <rect x="9" y="68" width="42" height="42"
+                fill="url(#hg-gems-{{key}})" filter="url(#hf-tex-{{key}})"/>
+          <circle cx="20" cy="81" r="2"   fill="url(#hg-hi-{{key}})" opacity="0.42"
+                  filter="url(#hf-bs-{{key}})"/>
+          <circle cx="38" cy="77" r="1.5" fill="url(#hg-hi-{{key}})" opacity="0.34"
+                  filter="url(#hf-bs-{{key}})"/>
+        </g>
+        <circle cx="30" cy="89" r="21"
+                fill="url(#hg-glass-{{key}})" stroke="#9a7020" stroke-width="1.2"/>
+        <ellipse cx="21" cy="80" rx="9"   ry="6.5"
+                 fill="white" opacity="0.19" filter="url(#hf-bl-{{key}})"/>
+        <ellipse cx="18" cy="77" rx="4.5" ry="3.2"
+                 fill="white" opacity="0.36" filter="url(#hf-bs-{{key}})"/>
+        <circle  cx="15" cy="75" r="1.5" fill="white" opacity="0.62"/>
+
+        {{!-- Embases laiton --}}
+        <rect x="2"  y="1"   width="56" height="10" rx="3"
+              fill="url(#hg-cap-{{key}})" filter="url(#hf-gld-{{key}})"/>
+        <rect x="3"  y="1.5" width="54" height="2.5" rx="1.5"
+              fill="rgba(255,255,255,0.32)"/>
+        <rect x="2"  y="113" width="56" height="10" rx="3"
+              fill="url(#hg-cap-{{key}})" filter="url(#hf-gld-{{key}})"/>
+        <rect x="3"  y="120" width="54" height="2"  rx="1"
+              fill="rgba(0,0,0,0.28)"/>
+
+        {{!-- Rubis sur embases --}}
+        <circle cx="30" cy="6"   r="3.5" fill="#3a0008" stroke="#f0d060" stroke-width="0.7"/>
+        <circle cx="30" cy="6"   r="2.4" fill="#c01820"/>
+        <ellipse cx="29" cy="5"  rx="1.1" ry="0.7" fill="rgba(255,255,255,0.55)"/>
+        <circle cx="30" cy="118" r="3.5" fill="#3a0008" stroke="#f0d060" stroke-width="0.7"/>
+        <circle cx="30" cy="118" r="2.4" fill="#c01820"/>
+        <ellipse cx="29" cy="117" rx="1.1" ry="0.7" fill="rgba(255,255,255,0.55)"/>
+        {{!-- Cabochons --}}
+        <circle cx="10"  cy="6"   r="1.8" fill="#c9a84c"/>
+        <circle cx="50"  cy="6"   r="1.8" fill="#c9a84c"/>
+        <circle cx="10"  cy="118" r="1.8" fill="#c9a84c"/>
+        <circle cx="50"  cy="118" r="1.8" fill="#c9a84c"/>
+      </svg>
+
       <div class="hp4-cup-name">{{label}}</div>
       <div class="hp4-cup-score {{#if negative}}hp4-negative{{/if}}">{{points}}</div>
       <div class="hp4-cup-score-label">points</div>
@@ -19,7 +197,7 @@
         <button type="button" class="hp4-cup-btn" data-house="{{key}}" data-action="remove">
           <i class="fas fa-minus"></i>
         </button>
-        <input type="number" class="hp4-points-input" data-house="{{key}}" value="10" min="1" />
+        <input type="number" class="hp4-points-input" data-house="{{key}}" value="10" min="1"/>
         <button type="button" class="hp4-cup-btn" data-house="{{key}}" data-action="add">
           <i class="fas fa-plus"></i>
         </button>

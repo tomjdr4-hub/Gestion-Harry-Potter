@@ -10,6 +10,9 @@ const HOUSES = [
 ];
 
 export class HouseCupApp extends HandlebarsApplicationMixin(ApplicationV2) {
+  // Maison dont le sablier doit s'animer après le prochain render
+  #pendingAnim = null;
+
   static DEFAULT_OPTIONS = {
     id: "hp4-house-cup-app",
     classes: ["hp4-house-cup"],
@@ -48,6 +51,17 @@ export class HouseCupApp extends HandlebarsApplicationMixin(ApplicationV2) {
 
   _onRender(context, options) {
     super._onRender(context, options);
+
+    // Déclenche l'animation du sablier si des points viennent de changer
+    if (this.#pendingAnim) {
+      const svg = this.element.querySelector(`.hp4-sablier[data-house="${this.#pendingAnim}"]`);
+      if (svg) {
+        svg.classList.add("hp4-flowing");
+        setTimeout(() => svg.classList.remove("hp4-flowing"), 2000);
+      }
+      this.#pendingAnim = null;
+    }
+
     if (!game.user.isGM) return;
 
     this.element.querySelectorAll(".hp4-cup-btn").forEach(btn => {
@@ -60,6 +74,7 @@ export class HouseCupApp extends HandlebarsApplicationMixin(ApplicationV2) {
         const current = points[house] ?? 0;
         points[house] = action === "add" ? current + amount : current - amount;
 
+        this.#pendingAnim = house;
         await HouseCupApp.savePoints(points);
         this.render();
       });

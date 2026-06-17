@@ -1,0 +1,280 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 220">
+  <defs>
+    <style>
+      /*
+       * État repos : rien ne bouge.
+       * .hp4-flowing (ajouté par JS au changement de points) → animation unique 1,8 s.
+       */
+
+      /* Gems qui pulsent une fois quand les points changent */
+      @keyframes gem-pulse {
+        0%        { filter: brightness(1) saturate(1); }
+        30%, 70%  { filter: brightness(1.9) saturate(1.6)
+                             drop-shadow(0 0 7px var(--gc, #c9a84c)); }
+        100%      { filter: brightness(1) saturate(1); }
+      }
+      /* Grain qui tombe dans le col */
+      @keyframes drop-grain {
+        0%   { transform: translateY(-8px); opacity: 0; }
+        15%  { opacity: 1; }
+        85%  { opacity: 1; }
+        100% { transform: translateY(8px);  opacity: 0; }
+      }
+      /* Légère rotation du sablier (impression de magie) */
+      @keyframes rock {
+        0%,100% { transform: rotate(0deg);      }
+        25%     { transform: rotate(-3deg);     }
+        75%     { transform: rotate( 3deg);     }
+      }
+
+      .hp4-flowing .gems {
+        animation: gem-pulse 0.6s ease-in-out 3 forwards;
+      }
+      .hp4-flowing .grain {
+        animation: drop-grain 0.42s linear 3 forwards;
+      }
+      .hp4-flowing .grain.g2 { animation-delay: 0.14s; }
+      .hp4-flowing .grain.g3 { animation-delay: 0.28s; }
+      .hp4-flowing {
+        animation: rock 1.8s ease-in-out 1 forwards;
+        transform-origin: 50% 110px;
+        transform-box: fill-box;
+      }
+    </style>
+
+    <!-- ── OR / LAITON ─────────────────────────────── -->
+    <linearGradient id="g-cap" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#f8ec90"/>
+      <stop offset="18%"  stop-color="#d4a840"/>
+      <stop offset="60%"  stop-color="#c09030"/>
+      <stop offset="100%" stop-color="#7a5010"/>
+    </linearGradient>
+    <linearGradient id="g-pillar" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="#5a3808"/>
+      <stop offset="28%"  stop-color="#d8b040"/>
+      <stop offset="50%"  stop-color="#f5e878"/>
+      <stop offset="72%"  stop-color="#d8b040"/>
+      <stop offset="100%" stop-color="#5a3808"/>
+    </linearGradient>
+
+    <!-- ── VERRE (incidence de lumière haut-gauche) ── -->
+    <radialGradient id="g-glass" cx="32%" cy="30%" r="75%">
+      <stop offset="0%"   stop-color="rgba(255,255,255,0)"/>
+      <stop offset="55%"  stop-color="rgba(200,225,255,0.04)"/>
+      <stop offset="82%"  stop-color="rgba(180,210,245,0.14)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0.32)"/>
+    </radialGradient>
+
+    <!-- ── GEMS / SABLE ─────────────────────────────── -->
+    <!-- --gc = couleur de maison injectée par le parent CSS via style="--gc:#c0392b" -->
+    <radialGradient id="g-gems" cx="38%" cy="28%" r="78%">
+      <stop offset="0%"   stop-color="var(--gc, #c9a84c)" stop-opacity="1"/>
+      <stop offset="65%"  stop-color="var(--gc, #c9a84c)" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="rgba(0,0,0,0.55)"/>
+    </radialGradient>
+    <!-- Highlight "façette" sur chaque gem -->
+    <radialGradient id="g-highlight" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="rgba(255,255,255,0.65)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+    </radialGradient>
+
+    <!-- ── FILTRE : lueur dorée cadre ──────────────── -->
+    <filter id="f-gold" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur stdDeviation="2.2" result="b"/>
+      <feColorMatrix in="b"
+        values="1.5 0.9 0 0 0  0.8 0.5 0 0 0  0 0 0 0 0  0 0 0 0.4 0"
+        result="glow"/>
+      <feMerge><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <!-- ── FILTRE : ruby glow ───────────────────────── -->
+    <filter id="f-ruby" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="b"/>
+      <feColorMatrix in="b"
+        values="1.2 0 0 0 0  0 0 0 0 0  0 0 0.2 0 0  0 0 0 0.7 0"
+        result="glow"/>
+      <feMerge><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <!-- ── FILTRE : texture gems (bruit + déplacement) ─ -->
+    <filter id="f-gems" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.12 0.09"
+                    numOctaves="4" seed="3" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise"
+                         scale="5" xChannelSelector="R" yChannelSelector="G"
+                         result="displaced"/>
+      <feComposite in="displaced" in2="SourceGraphic" operator="in"/>
+    </filter>
+
+    <!-- ── FILTRE : flou doux highlights ─────────────── -->
+    <filter id="f-blur" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="3.5"/>
+    </filter>
+    <filter id="f-blur-s" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="1.8"/>
+    </filter>
+    <filter id="f-blur-xs" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="0.9"/>
+    </filter>
+
+    <!-- ── CLIPS bols ────────────────────────────────── -->
+    <clipPath id="c-top"><circle cx="50" cy="65" r="42"/></clipPath>
+    <clipPath id="c-bot"><circle cx="50" cy="157" r="42"/></clipPath>
+  </defs>
+
+  <!-- ────────────────────────────────────────────────── -->
+  <!--  OMBRE PORTÉE                                     -->
+  <!-- ────────────────────────────────────────────────── -->
+  <ellipse cx="50" cy="217" rx="34" ry="5"
+           fill="rgba(0,0,0,0.4)" filter="url(#f-blur)"/>
+
+  <!-- ────────────────────────────────────────────────── -->
+  <!--  PILIERS LAITON                                   -->
+  <!-- ────────────────────────────────────────────────── -->
+  <rect x="6"  y="18" width="7" height="184" rx="2" fill="url(#g-pillar)"/>
+  <rect x="87" y="18" width="7" height="184" rx="2" fill="url(#g-pillar)"/>
+  <!-- Anneaux décoratifs sur les piliers -->
+  <rect x="6"  y="57"  width="7" height="2.5" rx="1" fill="#f0e070" opacity="0.8"/>
+  <rect x="6"  y="107" width="7" height="2.5" rx="1" fill="#f0e070" opacity="0.8"/>
+  <rect x="6"  y="157" width="7" height="2.5" rx="1" fill="#f0e070" opacity="0.8"/>
+  <rect x="87" y="57"  width="7" height="2.5" rx="1" fill="#f0e070" opacity="0.8"/>
+  <rect x="87" y="107" width="7" height="2.5" rx="1" fill="#f0e070" opacity="0.8"/>
+  <rect x="87" y="157" width="7" height="2.5" rx="1" fill="#f0e070" opacity="0.8"/>
+
+  <!-- ────────────────────────────────────────────────── -->
+  <!--  BOL SUPÉRIEUR                                    -->
+  <!-- ────────────────────────────────────────────────── -->
+  <!-- Fond intérieur sombre (verre opaque non éclairé) -->
+  <circle cx="50" cy="65" r="42" fill="#04060d"/>
+
+  <!-- Gems (texture turbulence + gradient maison) -->
+  <g class="gems" clip-path="url(#c-top)">
+    <rect x="8" y="23" width="84" height="84"
+          fill="url(#g-gems)" filter="url(#f-gems)"/>
+    <!-- Points de brillance aléatoires (facettes) -->
+    <circle cx="32" cy="52" r="3"  fill="url(#g-highlight)" opacity="0.5"
+            filter="url(#f-blur-xs)"/>
+    <circle cx="58" cy="44" r="2"  fill="url(#g-highlight)" opacity="0.4"
+            filter="url(#f-blur-xs)"/>
+    <circle cx="44" cy="74" r="2.5" fill="url(#g-highlight)" opacity="0.35"
+            filter="url(#f-blur-xs)"/>
+    <circle cx="68" cy="70" r="1.8" fill="url(#g-highlight)" opacity="0.3"
+            filter="url(#f-blur-xs)"/>
+  </g>
+
+  <!-- Calque verre (presque transparent, bord brillant) -->
+  <circle cx="50" cy="65" r="42"
+          fill="url(#g-glass)" stroke="#9a7020" stroke-width="1.8"/>
+
+  <!-- Reflet principal (grande tache douce haut-gauche) -->
+  <ellipse cx="34" cy="47" rx="17" ry="13"
+           fill="white" opacity="0.28" filter="url(#f-blur)"/>
+  <!-- Reflet spéculaire (plus net) -->
+  <ellipse cx="28" cy="43" rx="8"  ry="5.5"
+           fill="white" opacity="0.48" filter="url(#f-blur-s)"/>
+  <!-- Point lumineux intense -->
+  <circle cx="23" cy="39" r="2.5" fill="white" opacity="0.72"/>
+  <!-- Micro-éclat -->
+  <circle cx="21" cy="37" r="1"   fill="white" opacity="0.9"/>
+  <!-- Contre-jour bas-droit (subtil) -->
+  <ellipse cx="68" cy="83" rx="7" ry="5"
+           fill="white" opacity="0.07" filter="url(#f-blur-s)"/>
+
+  <!-- ────────────────────────────────────────────────── -->
+  <!--  COL DU SABLIER                                   -->
+  <!-- ────────────────────────────────────────────────── -->
+  <!-- Tube intérieur -->
+  <rect x="44" y="107" width="12" height="16" rx="1" fill="#04060d"/>
+  <!-- Verre du tube -->
+  <rect x="44" y="107" width="12" height="16" rx="1"
+        fill="url(#g-glass)" stroke="#9a7020" stroke-width="0.7"/>
+  <!-- Reflet côté gauche tube -->
+  <rect x="45.5" y="108" width="2.5" height="14" rx="1"
+        fill="white" opacity="0.2"/>
+  <!-- Anneaux laiton haut/bas du col -->
+  <rect x="40" y="104" width="20" height="5" rx="2.5"
+        fill="url(#g-cap)" filter="url(#f-gold)"/>
+  <rect x="40" y="121" width="20" height="5" rx="2.5"
+        fill="url(#g-cap)" filter="url(#f-gold)"/>
+
+  <!-- Grains animés (visibles seulement pendant .hp4-flowing) -->
+  <circle class="grain"    cx="50" cy="115" r="1.3"
+          fill="var(--gc, #c9a84c)" opacity="0"/>
+  <circle class="grain g2" cx="50" cy="115" r="1.3"
+          fill="var(--gc, #c9a84c)" opacity="0"/>
+  <circle class="grain g3" cx="50" cy="115" r="1.3"
+          fill="var(--gc, #c9a84c)" opacity="0"/>
+
+  <!-- ────────────────────────────────────────────────── -->
+  <!--  BOL INFÉRIEUR                                    -->
+  <!-- ────────────────────────────────────────────────── -->
+  <circle cx="50" cy="157" r="42" fill="#04060d"/>
+
+  <g class="gems" clip-path="url(#c-bot)">
+    <rect x="8" y="115" width="84" height="84"
+          fill="url(#g-gems)" filter="url(#f-gems)"/>
+    <circle cx="32" cy="144" r="3"   fill="url(#g-highlight)" opacity="0.45"
+            filter="url(#f-blur-xs)"/>
+    <circle cx="60" cy="138" r="2"   fill="url(#g-highlight)" opacity="0.38"
+            filter="url(#f-blur-xs)"/>
+    <circle cx="44" cy="168" r="2.5" fill="url(#g-highlight)" opacity="0.3"
+            filter="url(#f-blur-xs)"/>
+    <circle cx="70" cy="162" r="1.8" fill="url(#g-highlight)" opacity="0.28"
+            filter="url(#f-blur-xs)"/>
+  </g>
+
+  <circle cx="50" cy="157" r="42"
+          fill="url(#g-glass)" stroke="#9a7020" stroke-width="1.8"/>
+
+  <ellipse cx="34" cy="139" rx="17" ry="13"
+           fill="white" opacity="0.22" filter="url(#f-blur)"/>
+  <ellipse cx="28" cy="135" rx="8"  ry="5.5"
+           fill="white" opacity="0.38" filter="url(#f-blur-s)"/>
+  <circle cx="23" cy="131" r="2.5" fill="white" opacity="0.64"/>
+  <circle cx="21" cy="129" r="1"   fill="white" opacity="0.85"/>
+  <ellipse cx="68" cy="175" rx="7" ry="5"
+           fill="white" opacity="0.06" filter="url(#f-blur-s)"/>
+
+  <!-- ────────────────────────────────────────────────── -->
+  <!--  EMBASES LAITON (par-dessus tout)                 -->
+  <!-- ────────────────────────────────────────────────── -->
+  <!-- Embase haute -->
+  <rect x="4" y="2" width="92" height="16" rx="4"
+        fill="url(#g-cap)" filter="url(#f-gold)"/>
+  <!-- Biseau lumineux haut -->
+  <rect x="5" y="2.5" width="90" height="3" rx="2"
+        fill="rgba(255,255,255,0.35)"/>
+  <!-- Biseau sombre bas -->
+  <rect x="5" y="14.5" width="90" height="2" rx="1"
+        fill="rgba(0,0,0,0.25)"/>
+
+  <!-- Embase basse -->
+  <rect x="4" y="202" width="92" height="16" rx="4"
+        fill="url(#g-cap)" filter="url(#f-gold)"/>
+  <rect x="5" y="202.5" width="90" height="3" rx="2"
+        fill="rgba(255,255,255,0.3)"/>
+  <rect x="5" y="215"   width="90" height="2" rx="1"
+        fill="rgba(0,0,0,0.3)"/>
+
+  <!-- ────────────────────────────────────────────────── -->
+  <!--  RUBIS DÉCORATIFS SUR EMBASES                     -->
+  <!-- ────────────────────────────────────────────────── -->
+  <!-- Rubis central haut -->
+  <circle cx="50" cy="10" r="5.5" fill="#3a0008"
+          stroke="#f0d060" stroke-width="1" filter="url(#f-ruby)"/>
+  <circle cx="50" cy="10" r="3.8" fill="#b51020"/>
+  <ellipse cx="48" cy="8.5" rx="1.6" ry="1.1"
+           fill="rgba(255,255,255,0.55)"/>
+  <!-- Rubis central bas -->
+  <circle cx="50" cy="210" r="5.5" fill="#3a0008"
+          stroke="#f0d060" stroke-width="1" filter="url(#f-ruby)"/>
+  <circle cx="50" cy="210" r="3.8" fill="#b51020"/>
+  <ellipse cx="48" cy="208.5" rx="1.6" ry="1.1"
+           fill="rgba(255,255,255,0.55)"/>
+
+  <!-- Cabochons dorés aux extrémités des embases -->
+  <circle cx="16"  cy="10"  r="2.8" fill="#c9a84c" stroke="#7a5010" stroke-width="0.5"/>
+  <circle cx="84"  cy="10"  r="2.8" fill="#c9a84c" stroke="#7a5010" stroke-width="0.5"/>
+  <circle cx="16"  cy="210" r="2.8" fill="#c9a84c" stroke="#7a5010" stroke-width="0.5"/>
+  <circle cx="84"  cy="210" r="2.8" fill="#c9a84c" stroke="#7a5010" stroke-width="0.5"/>
+</svg>
