@@ -2,7 +2,7 @@
   "id": "gestion-harry-potter",
   "title": "Gestion Harry Potter",
   "description": "Outil de gestion pour campagnes Harry Potter : classes, emploi du temps, PNJ, clubs et Coupe des Quatre Maisons.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "compatibility": {
     "minimum": "14",
     "verified": "14"
