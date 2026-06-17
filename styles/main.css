@@ -1,5 +1,11 @@
 /* Gestion Harry Potter - styles */
 
+/* Conteneur racine commun à toutes les apps (classes, npcs, préfets, clubs) */
+.hp4-root {
+  height: 100%;
+  overflow: hidden;
+}
+
 .hp4-main {
   display: flex;
   flex-direction: column;

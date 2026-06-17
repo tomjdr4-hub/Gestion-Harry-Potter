@@ -3,6 +3,7 @@
   flex-direction: column;
   height: 100%;
   padding: 0.5rem;
+  overflow: hidden;
 }
 
 .hp4-classes-header {
@@ -97,6 +98,12 @@
   background: #7b2d2d;
   color: #fff;
   border-color: #a84444;
+}
+
+.hp4-year-panels {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 .hp4-year-panel {
