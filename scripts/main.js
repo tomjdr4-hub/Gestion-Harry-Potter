@@ -53,6 +53,15 @@ Hooks.once("init", function () {
   game.settings.register(MODULE_ID, "character-profiles", {
     scope: "world", config: false, type: Object, default: {}
   });
+  game.settings.register(MODULE_ID, "classes-viewing-year", {
+    scope: "world", config: false, type: String, default: ""
+  });
+  game.settings.register(MODULE_ID, "prefets-data", {
+    scope: "world", config: false, type: Object, default: {}
+  });
+  game.settings.register(MODULE_ID, "prefets-viewing-year", {
+    scope: "world", config: false, type: String, default: ""
+  });
 });
 
 Hooks.once("ready", function () {

@@ -28,7 +28,8 @@ export class ClassesApp extends HandlebarsApplicationMixin(ApplicationV2) {
   };
 
   #activeYearIndex = 0;
-  #viewingYear = null; // null = année courante
+  #viewingYear = null;       // null = année courante
+  #viewingYearLoaded = false;
 
   // ── Store ──────────────────────────────────────────────────────────────────
 
@@ -84,6 +85,18 @@ export class ClassesApp extends HandlebarsApplicationMixin(ApplicationV2) {
   async _prepareContext() {
     const store = ClassesApp.getStore();
     const currentYear = store.currentYear ?? "";
+
+    // Restaurer l'année affichée depuis le setting persisté (1 seule fois par instance)
+    if (!this.#viewingYearLoaded) {
+      this.#viewingYearLoaded = true;
+      try {
+        const saved = game.settings.get(MODULE_ID, "classes-viewing-year");
+        if (saved && saved !== currentYear && (store.years ?? {})[saved]) {
+          this.#viewingYear = saved;
+        }
+      } catch {}
+    }
+
     const viewingYear = this.#viewingYear ?? currentYear;
     const classData = (store.years ?? {})[viewingYear] ?? {};
     const isGM = game.user.isGM;
@@ -132,12 +145,13 @@ export class ClassesApp extends HandlebarsApplicationMixin(ApplicationV2) {
       });
     });
 
-    // Liste déroulante des années
-    this.element.querySelector(".hp4-year-select")?.addEventListener("change", (e) => {
+    // Liste déroulante des années — avec persistance du choix
+    this.element.querySelector(".hp4-year-select")?.addEventListener("change", async (e) => {
       const store = ClassesApp.getStore();
       const selected = e.target.value;
       this.#viewingYear = selected === store.currentYear ? null : selected;
       this.#activeYearIndex = 0;
+      try { await game.settings.set(MODULE_ID, "classes-viewing-year", selected); } catch {}
       this.render();
     });
 

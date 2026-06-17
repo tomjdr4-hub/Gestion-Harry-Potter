@@ -4,6 +4,7 @@ import { NpcsApp } from "./npcsApp.js";
 import { HouseCupApp } from "./houseCupApp.js";
 import { ClubsApp } from "./clubsApp.js";
 import { TimetableApp } from "./timetableApp.js";
+import { PrefetsApp } from "./prefetsApp.js";
 
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
@@ -46,5 +47,7 @@ export class GestionHarryPotterApp extends HandlebarsApplicationMixin(Applicatio
       ?.addEventListener("click", () => new HouseCupApp().render(true));
     this.element.querySelector("[data-action='open-clubs']")
       ?.addEventListener("click", () => new ClubsApp().render(true));
+    this.element.querySelector("[data-action='open-prefets']")
+      ?.addEventListener("click", () => new PrefetsApp().render(true));
   }
 }

@@ -1,0 +1,69 @@
+<div class="hp4-root">
+  <div class="hp4-prefets-wrapper">
+
+    {{#if isGM}}
+    <div class="hp4-classes-header">
+      {{#if currentYear}}
+        <i class="fas fa-shield-alt hp4-year-icon"></i>
+        <select class="hp4-year-select">
+          {{#each yearsList}}
+            <option value="{{this}}" {{#if (eq this ../viewingYear)}}selected{{/if}}>
+              {{#if (eq this ../currentYear)}}★ {{/if}}{{this}}
+            </option>
+          {{/each}}
+        </select>
+        <button type="button" class="hp4-edit-year-btn" title="Renommer l'année courante">
+          <i class="fas fa-pen"></i>
+        </button>
+        {{#if isCurrentYear}}
+          <button type="button" class="hp4-advance-year-btn">
+            <i class="fas fa-forward-step"></i> Nouvelle année
+          </button>
+        {{else}}
+          <span class="hp4-readonly-badge"><i class="fas fa-lock"></i> Lecture seule</span>
+        {{/if}}
+      {{else}}
+        <span class="hp4-school-year-label">
+          <i class="fas fa-shield-alt"></i> <em>Aucune année scolaire définie</em>
+        </span>
+        <button type="button" class="hp4-init-year-btn">
+          <i class="fas fa-calendar-plus"></i> Initialiser
+        </button>
+      {{/if}}
+    </div>
+    {{/if}}
+
+    <div class="hp4-prefets-grid">
+      {{#each houses}}
+        <div class="hp4-house-zone hp4-house-drop" data-house="{{key}}">
+          <h4 class="hp4-house-title hp4-house-{{key}}">
+            <i class="{{icon}}"></i> {{label}}
+          </h4>
+          <div class="hp4-actors-grid">
+            {{#each actors}}
+              <div class="hp4-actor-card" data-id="{{id}}" data-house="{{../key}}">
+                <img src="{{img}}" alt="{{name}}" draggable="false" />
+                <span>{{name}}</span>
+                {{#if ../../canEdit}}
+                  <button type="button" class="hp4-remove-actor" title="Retirer">
+                    <i class="fas fa-times"></i>
+                  </button>
+                {{/if}}
+                <button type="button" class="hp4-fiche-btn" data-id="{{id}}" title="Fiche d'identité">
+                  <i class="fas fa-address-card"></i>
+                </button>
+              </div>
+            {{else}}
+              <p class="hp4-empty">Aucun préfet</p>
+            {{/each}}
+          </div>
+        </div>
+      {{/each}}
+    </div>
+
+    {{#if canEdit}}
+      <p class="hp4-hint"><i class="fas fa-info-circle"></i> Glissez des acteurs dans une maison</p>
+    {{/if}}
+
+  </div>
+</div>
