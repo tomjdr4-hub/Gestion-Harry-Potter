@@ -45,6 +45,8 @@ export class ClubsApp extends HandlebarsApplicationMixin(ApplicationV2) {
       const noteKey = `club-${this.#currentClub}`;
       const entries = allNotes[noteKey] ?? [];
 
+      const journalEntry = club.journalId ? game.journal.get(club.journalId) : null;
+
       return {
         view: "detail",
         clubId: this.#currentClub,
@@ -55,6 +57,7 @@ export class ClubsApp extends HandlebarsApplicationMixin(ApplicationV2) {
           presidentId: club.presidentId ?? null,
           members,
           entries,
+          journalName: journalEntry?.name ?? "Journal",
         },
         isGM,
       };
@@ -207,6 +210,40 @@ export class ClubsApp extends HandlebarsApplicationMixin(ApplicationV2) {
         new ImagePopout(actor.img, { title: actor.name, shareable: true, uuid: actor.uuid }).render(true);
       });
     });
+
+    // Ouvrir le journal Foundry lié (pour tous)
+    this.element.querySelector(".hp4-open-journal-btn")?.addEventListener("click", (e) => {
+      game.journal.get(e.currentTarget.dataset.id)?.sheet.render(true);
+    });
+
+    if (isGM) {
+      // Zone de drop pour lier un journal Foundry
+      const journalLinkDrop = this.element.querySelector(".hp4-journal-link-drop");
+      if (journalLinkDrop) {
+        journalLinkDrop.addEventListener("dragover", e => { e.preventDefault(); journalLinkDrop.classList.add("drag-over"); });
+        journalLinkDrop.addEventListener("dragleave", () => journalLinkDrop.classList.remove("drag-over"));
+        journalLinkDrop.addEventListener("drop", async (e) => {
+          e.preventDefault();
+          journalLinkDrop.classList.remove("drag-over");
+          let data;
+          try { data = JSON.parse(e.dataTransfer.getData("text/plain")); } catch { return; }
+          if (data.type !== "JournalEntry") return;
+          const journalId = data.uuid?.split(".").pop() ?? data.id;
+          const clubs = ClubsApp.getClubsData();
+          clubs[clubId].journalId = journalId;
+          await ClubsApp.saveClubsData(clubs);
+          this.render();
+        });
+      }
+
+      // Délier le journal
+      this.element.querySelector(".hp4-unlink-journal-btn")?.addEventListener("click", async () => {
+        const clubs = ClubsApp.getClubsData();
+        delete clubs[clubId].journalId;
+        await ClubsApp.saveClubsData(clubs);
+        this.render();
+      });
+    }
 
     // Journal de notes
     this.#registerClubJournal(clubId);

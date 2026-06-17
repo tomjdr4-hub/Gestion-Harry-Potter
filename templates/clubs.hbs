@@ -100,28 +100,49 @@
       <!-- Journal -->
       <section class="hp4-club-section">
         <h3><i class="fas fa-book"></i> Journal du club</h3>
-        <div class="hp4-club-journal">
-          {{#each club.entries}}
-            <div class="hp4-journal-entry">
-              <div class="hp4-journal-meta">
-                <span class="hp4-journal-author">{{author}}</span>
-                <span class="hp4-journal-date">{{date}}</span>
-                {{#if ../isGM}}
-                  <button type="button" class="hp4-journal-delete" data-index="{{@index}}" title="Supprimer">
-                    <i class="fas fa-trash"></i>
-                  </button>
-                {{/if}}
+
+        {{#if club.journalId}}
+          <!-- Journal Foundry lié -->
+          <div class="hp4-linked-journal">
+            <button type="button" class="hp4-open-journal-btn" data-id="{{club.journalId}}">
+              <i class="fas fa-book-open"></i> {{club.journalName}}
+            </button>
+            {{#if isGM}}
+              <button type="button" class="hp4-unlink-journal-btn" title="Délier ce journal">
+                <i class="fas fa-unlink"></i>
+              </button>
+            {{/if}}
+          </div>
+        {{else}}
+          <!-- Notes rapides -->
+          <div class="hp4-club-journal">
+            {{#each club.entries}}
+              <div class="hp4-journal-entry">
+                <div class="hp4-journal-meta">
+                  <span class="hp4-journal-author">{{author}}</span>
+                  <span class="hp4-journal-date">{{date}}</span>
+                  {{#if ../isGM}}
+                    <button type="button" class="hp4-journal-delete" data-index="{{@index}}" title="Supprimer">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  {{/if}}
+                </div>
+                <div class="hp4-journal-text">{{text}}</div>
               </div>
-              <div class="hp4-journal-text">{{text}}</div>
+            {{else}}
+              <p class="hp4-empty">Aucune note pour l'instant.</p>
+            {{/each}}
+          </div>
+          <textarea class="hp4-journal-textarea" rows="3" placeholder="Ajouter une note..."></textarea>
+          <div class="hp4-note-actions">
+            <button type="button" class="hp4-journal-save">Ajouter</button>
+          </div>
+          {{#if isGM}}
+            <div class="hp4-journal-link-drop">
+              <i class="fas fa-link"></i> Glissez un journal Foundry ici pour le lier
             </div>
-          {{else}}
-            <p class="hp4-empty">Aucune note pour l'instant.</p>
-          {{/each}}
-        </div>
-        <textarea class="hp4-journal-textarea" rows="3" placeholder="Ajouter une note..."></textarea>
-        <div class="hp4-note-actions">
-          <button type="button" class="hp4-journal-save">Ajouter</button>
-        </div>
+          {{/if}}
+        {{/if}}
       </section>
 
     </div>

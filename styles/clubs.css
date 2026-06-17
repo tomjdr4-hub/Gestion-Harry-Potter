@@ -208,3 +208,59 @@
   cursor: pointer;
   margin-top: 0.25rem;
 }
+
+/* Journal Foundry lié */
+.hp4-linked-journal {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem;
+  background: #111;
+  border-radius: 6px;
+}
+
+.hp4-open-journal-btn {
+  flex: 1;
+  background: #1a1f2e;
+  border: 1px solid #3a5080;
+  color: #7fa8d4;
+  border-radius: 4px;
+  padding: 0.45rem 0.75rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.hp4-open-journal-btn:hover { background: #243050; }
+
+.hp4-unlink-journal-btn {
+  background: none;
+  border: none;
+  color: #444;
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 0.25rem 0.4rem;
+  border-radius: 4px;
+  transition: color 0.15s;
+}
+
+.hp4-unlink-journal-btn:hover { color: #e74c3c; }
+
+/* Zone de drop pour lier un journal */
+.hp4-journal-link-drop {
+  margin-top: 0.5rem;
+  border: 2px dashed #2d2d2d;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  color: #444;
+  font-size: 0.78rem;
+  text-align: center;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+
+.hp4-journal-link-drop.drag-over {
+  border-color: #3a5080;
+  background: rgba(58, 80, 128, 0.1);
+  color: #7fa8d4;
+}
