@@ -1,3 +1,17 @@
+.hp4-fiche-btn {
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  font-size: 0.65rem;
+  padding: 0;
+  margin-top: 2px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.hp4-fiche-btn:hover { color: #c9a84c; }
+
 .hp4-note-btn {
   background: none;
   border: none;

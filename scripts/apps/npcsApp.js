@@ -1,5 +1,5 @@
 import { MODULE_ID } from "../constants.js";
-import { getActorNotes, registerNoteModal } from "../utils/notes.js";
+import { FicheApp } from "./ficheApp.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -26,36 +26,24 @@ export class NpcsApp extends HandlebarsApplicationMixin(ApplicationV2) {
 
  async _prepareContext() {
   const ids = NpcsApp.getNpcData();
-  const all = getActorNotes();
   const npcs = ids
     .map(id => game.actors.get(id))
     .filter(Boolean)
-    .map(a => ({
-      id: a.id,
-      name: a.name,
-      img: a.img,
-      entries: all[a.id] ?? []
-    }));
+    .map(a => ({ id: a.id, name: a.name, img: a.img }));
 
   return { npcs, isGM: game.user.isGM };
 }
 
   _onRender(context, options) {
     super._onRender(context, options);
-    // Notes
-registerNoteModal(this);
-    // Clic portrait → ImagePopout
-    this.element.querySelectorAll(".hp4-actor-card img").forEach(img => {
-      img.style.cursor = "pointer";
-      img.addEventListener("click", (e) => {
+
+    // Fiche d'identité — clic portrait ou bouton fiche
+    this.element.querySelectorAll(".hp4-actor-card img, .hp4-fiche-btn").forEach(el => {
+      el.style.cursor = "pointer";
+      el.addEventListener("click", (e) => {
+        e.stopPropagation();
         const actorId = e.currentTarget.closest(".hp4-actor-card").dataset.id;
-        const actor = game.actors.get(actorId);
-        if (!actor) return;
-        new ImagePopout(actor.img, {
-          title: actor.name,
-          shareable: true,
-          uuid: actor.uuid
-        }).render(true);
+        if (actorId) FicheApp.open(actorId);
       });
     });
 

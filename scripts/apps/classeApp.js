@@ -1,5 +1,5 @@
 import { MODULE_ID } from "../constants.js";
-import { getActorNotes, registerNoteModal } from "../utils/notes.js";
+import { FicheApp } from "./ficheApp.js";
 
 const YEARS = [
   "1ère année", "2ème année", "3ème année", "4ème année",
@@ -88,7 +88,6 @@ export class ClassesApp extends HandlebarsApplicationMixin(ApplicationV2) {
     const classData = (store.years ?? {})[viewingYear] ?? {};
     const isGM = game.user.isGM;
     const canEdit = isGM && viewingYear === currentYear;
-    const actorNotes = getActorNotes();
 
     const allYears = Object.keys(store.years ?? {});
     const yearsList = [currentYear, ...allYears.filter(y => y !== currentYear).reverse()].filter(Boolean);
@@ -107,7 +106,7 @@ export class ClassesApp extends HandlebarsApplicationMixin(ApplicationV2) {
     });
 
     return {
-      years, houses: HOUSES, isGM, canEdit, actorNotes,
+      years, houses: HOUSES, isGM, canEdit,
       currentYear, viewingYear, yearsList,
       isCurrentYear: viewingYear === currentYear,
     };
@@ -142,18 +141,15 @@ export class ClassesApp extends HandlebarsApplicationMixin(ApplicationV2) {
       this.render();
     });
 
-    // Portrait → ImagePopout
-    this.element.querySelectorAll(".hp4-actor-card img").forEach(img => {
-      img.style.cursor = "pointer";
-      img.addEventListener("click", (e) => {
+    // Fiche d'identité — clic portrait ou bouton fiche
+    this.element.querySelectorAll(".hp4-actor-card img, .hp4-fiche-btn").forEach(el => {
+      el.style.cursor = "pointer";
+      el.addEventListener("click", (e) => {
+        e.stopPropagation();
         const actorId = e.currentTarget.closest(".hp4-actor-card").dataset.id;
-        const actor = game.actors.get(actorId);
-        if (!actor) return;
-        new ImagePopout(actor.img, { title: actor.name, shareable: true, uuid: actor.uuid }).render(true);
+        if (actorId) FicheApp.open(actorId);
       });
     });
-
-    registerNoteModal(this);
 
     if (!context.isGM) return;
 

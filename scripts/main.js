@@ -50,6 +50,9 @@ Hooks.once("init", function () {
   game.settings.register(MODULE_ID, "school-year", {
     scope: "world", config: false, type: String, default: ""
   });
+  game.settings.register(MODULE_ID, "character-profiles", {
+    scope: "world", config: false, type: Object, default: {}
+  });
 });
 
 Hooks.once("ready", function () {

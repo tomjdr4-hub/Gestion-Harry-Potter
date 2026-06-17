@@ -1,0 +1,34 @@
+<div class="hp4-fiche-wrapper">
+  {{#if actor}}
+    <div class="hp4-fiche-header">
+      <img class="hp4-fiche-portrait"
+           src="{{actor.img}}"
+           alt="{{actor.name}}"
+           title="Voir le portrait complet" />
+      <div class="hp4-fiche-name">{{actor.name}}</div>
+    </div>
+
+    <div class="hp4-fiche-section">
+      <div class="hp4-fiche-label">Relation</div>
+      <div class="hp4-rel-bar">
+        {{#each relations}}
+          <button type="button"
+                  class="hp4-rel-btn{{#if active}} active{{/if}}"
+                  data-rel="{{key}}"
+                  style="--rc: {{color}}"
+                  title="{{label}}">
+            {{label}}
+          </button>
+        {{/each}}
+      </div>
+    </div>
+
+    <div class="hp4-fiche-section hp4-fiche-section--grow">
+      <div class="hp4-fiche-label">Notes</div>
+      <textarea class="hp4-fiche-notes"
+                placeholder="Notes sur ce personnage…">{{notes}}</textarea>
+    </div>
+  {{else}}
+    <p class="hp4-empty">Acteur introuvable.</p>
+  {{/if}}
+</div>
