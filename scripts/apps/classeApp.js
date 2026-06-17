@@ -28,28 +28,42 @@ export class ClassesApp extends HandlebarsApplicationMixin(ApplicationV2) {
   };
 
   #activeYearIndex = 0;
+  #viewingYear = null; // null = année courante
+
+  // ── Store ──────────────────────────────────────────────────────────────────
+
+  static getStore() {
+    try {
+      const raw = game.settings.get(MODULE_ID, "classes-data") ?? {};
+      if ("years" in raw) return raw;
+      // Migration depuis l'ancien format plat
+      const schoolYear = (() => {
+        try { return game.settings.get(MODULE_ID, "school-year") ?? ""; } catch { return ""; }
+      })();
+      const hasData = Object.keys(raw).some(k => k.startsWith("year-"));
+      return { currentYear: schoolYear, years: hasData ? { [schoolYear]: raw } : {} };
+    } catch { return { currentYear: "", years: {} }; }
+  }
+
+  static async saveStore(store) {
+    await game.settings.set(MODULE_ID, "classes-data", store);
+  }
 
   static getClassData() {
-    try { return game.settings.get(MODULE_ID, "classes-data") ?? {}; }
-    catch { return {}; }
+    const store = ClassesApp.getStore();
+    return store.years[store.currentYear] ?? {};
   }
 
   static async saveClassData(data) {
-    await game.settings.set(MODULE_ID, "classes-data", data);
-  }
-
-  static getSchoolYear() {
-    try { return game.settings.get(MODULE_ID, "school-year") ?? ""; }
-    catch { return ""; }
-  }
-
-  static async saveSchoolYear(year) {
-    await game.settings.set(MODULE_ID, "school-year", year);
+    const store = ClassesApp.getStore();
+    if (!store.years) store.years = {};
+    store.years[store.currentYear] = data;
+    await ClassesApp.saveStore(store);
   }
 
   static nextSchoolYear(current) {
     const match = current.match(/^(\d{4})-(\d{4})$/);
-    if (!match) return current;
+    if (!match) return null;
     return `${parseInt(match[1]) + 1}-${parseInt(match[2]) + 1}`;
   }
 
@@ -61,23 +75,29 @@ export class ClassesApp extends HandlebarsApplicationMixin(ApplicationV2) {
         shifted[`year-${y}-${house}`] = classData[`year-${y - 1}-${house}`] ?? [];
       }
     }
-    for (const house of houseKeys) {
-      shifted[`year-1-${house}`] = [];
-    }
+    for (const house of houseKeys) shifted[`year-1-${house}`] = [];
     return shifted;
   }
 
+  // ── Contexte ───────────────────────────────────────────────────────────────
+
   async _prepareContext() {
-    const classData = ClassesApp.getClassData();
+    const store = ClassesApp.getStore();
+    const currentYear = store.currentYear ?? "";
+    const viewingYear = this.#viewingYear ?? currentYear;
+    const classData = (store.years ?? {})[viewingYear] ?? {};
     const isGM = game.user.isGM;
+    const canEdit = isGM && viewingYear === currentYear;
     const actorNotes = getActorNotes();
+
+    const allYears = Object.keys(store.years ?? {});
+    const yearsList = [currentYear, ...allYears.filter(y => y !== currentYear).reverse()].filter(Boolean);
 
     const years = YEARS.map((label, index) => {
       const yearKey = `year-${index + 1}`;
       const actors = {};
       for (const house of HOUSES) {
-        const storageKey = `${yearKey}-${house.key}`;
-        const ids = classData[storageKey] ?? [];
+        const ids = classData[`${yearKey}-${house.key}`] ?? [];
         actors[house.key] = ids
           .map(id => game.actors.get(id))
           .filter(Boolean)
@@ -86,19 +106,23 @@ export class ClassesApp extends HandlebarsApplicationMixin(ApplicationV2) {
       return { label, yearKey, actors };
     });
 
-    return { years, houses: HOUSES, isGM, actorNotes, schoolYear: ClassesApp.getSchoolYear() };
+    return {
+      years, houses: HOUSES, isGM, canEdit, actorNotes,
+      currentYear, viewingYear, yearsList,
+      isCurrentYear: viewingYear === currentYear,
+    };
   }
+
+  // ── Rendu ──────────────────────────────────────────────────────────────────
 
   _onRender(context, options) {
     super._onRender(context, options);
 
-    // Onglets par année
+    // Onglets
     const tabs = this.element.querySelectorAll(".hp4-year-tab");
     const panels = this.element.querySelectorAll(".hp4-year-panel");
-
     tabs[this.#activeYearIndex]?.classList.add("active");
     panels[this.#activeYearIndex]?.classList.add("active");
-
     tabs.forEach((tab, i) => {
       tab.addEventListener("click", () => {
         tabs.forEach(t => t.classList.remove("active"));
@@ -109,143 +133,136 @@ export class ClassesApp extends HandlebarsApplicationMixin(ApplicationV2) {
       });
     });
 
-    // Clic portrait → ImagePopout (pour tous)
+    // Liste déroulante des années
+    this.element.querySelector(".hp4-year-select")?.addEventListener("change", (e) => {
+      const store = ClassesApp.getStore();
+      const selected = e.target.value;
+      this.#viewingYear = selected === store.currentYear ? null : selected;
+      this.#activeYearIndex = 0;
+      this.render();
+    });
+
+    // Portrait → ImagePopout
     this.element.querySelectorAll(".hp4-actor-card img").forEach(img => {
       img.style.cursor = "pointer";
       img.addEventListener("click", (e) => {
         const actorId = e.currentTarget.closest(".hp4-actor-card").dataset.id;
         const actor = game.actors.get(actorId);
         if (!actor) return;
-        new ImagePopout(actor.img, {
-          title: actor.name,
-          shareable: true,
-          uuid: actor.uuid
-        }).render(true);
+        new ImagePopout(actor.img, { title: actor.name, shareable: true, uuid: actor.uuid }).render(true);
       });
     });
 
-    // Notes (pour tous)
     registerNoteModal(this);
 
-    if (!game.user.isGM) return;
+    if (!context.isGM) return;
 
-    // Modifier l'année scolaire
-    this.element.querySelector(".hp4-edit-year-btn")?.addEventListener("click", async () => {
-      const current = ClassesApp.getSchoolYear();
-      const newYear = await foundry.applications.api.DialogV2.wait({
-        window: { title: "Année scolaire" },
-        content: `<label style="font-size:0.85rem">Année scolaire
-          <input type="text" id="hp4-year-input" value="${current.replace(/"/g, "&quot;")}"
-            placeholder="ex: 1992-1993" style="width:100%;margin-top:0.4rem">
-        </label>`,
-        buttons: [
-          { action: "ok", label: "Valider", default: true, callback: () => document.getElementById("hp4-year-input")?.value.trim() ?? "" },
-          { action: "cancel", label: "Annuler", callback: () => null }
-        ],
-        rejectClose: false
-      });
-      if (newYear === null) return;
-      await ClassesApp.saveSchoolYear(newYear);
+    // Initialiser la première année
+    this.element.querySelector(".hp4-init-year-btn")?.addEventListener("click", async () => {
+      const name = await this.#promptYear("");
+      if (!name) return;
+      const store = ClassesApp.getStore();
+      const existing = store.years[""] ?? {};
+      delete store.years[""];
+      store.years[name] = existing;
+      store.currentYear = name;
+      await ClassesApp.saveStore(store);
       this.render();
     });
 
-    // Passer à la nouvelle année scolaire
+    // Renommer l'année courante
+    this.element.querySelector(".hp4-edit-year-btn")?.addEventListener("click", async () => {
+      const store = ClassesApp.getStore();
+      const name = await this.#promptYear(store.currentYear);
+      if (!name || name === store.currentYear) return;
+      store.years[name] = store.years[store.currentYear] ?? {};
+      delete store.years[store.currentYear];
+      store.currentYear = name;
+      await ClassesApp.saveStore(store);
+      this.render();
+    });
+
+    // Nouvelle année scolaire
     this.element.querySelector(".hp4-advance-year-btn")?.addEventListener("click", async () => {
-      const current = ClassesApp.getSchoolYear();
+      const store = ClassesApp.getStore();
+      const current = store.currentYear;
       const next = ClassesApp.nextSchoolYear(current);
-      const yearLine = next ? `<p>Nouvelle année scolaire : <strong>${next}</strong></p>` : "";
       const confirmed = await foundry.applications.api.DialogV2.confirm({
         window: { title: "Nouvelle année scolaire" },
         content: `
           <p>Cette action va :</p>
           <ul style="margin:0.4rem 0 0.4rem 1.2rem">
+            <li>Archiver <strong>${current}</strong> en lecture seule</li>
             <li>Faire passer tous les élèves en classe supérieure</li>
             <li>Retirer les élèves de 7ème année (diplômés)</li>
             <li>Vider les classes de 1ère année</li>
           </ul>
-          ${yearLine}
-          <p><strong>Cette action est irréversible.</strong></p>`,
+          ${next ? `<p>Nouvelle année : <strong>${next}</strong></p>` : ""}`,
       });
       if (!confirmed) return;
-      const shifted = ClassesApp.shiftYearData(ClassesApp.getClassData());
-      await ClassesApp.saveClassData(shifted);
-      if (next) await ClassesApp.saveSchoolYear(next);
+      let nextYear = next;
+      if (!nextYear || store.years[nextYear]) {
+        nextYear = await this.#promptYear(next ?? "");
+        if (!nextYear) return;
+      }
+      store.years[nextYear] = ClassesApp.shiftYearData(store.years[current] ?? {});
+      store.currentYear = nextYear;
+      await ClassesApp.saveStore(store);
+      this.#viewingYear = null;
       this.#activeYearIndex = 0;
       this.render();
     });
 
-    // Rendre les cartes existantes draggables
+    if (!context.canEdit) return;
+
+    // Drag des cartes
     this.element.querySelectorAll(".hp4-actor-card[draggable='true']").forEach(card => {
-  card.addEventListener("dragstart", (e) => {
-    // Ignorer si on drag depuis un bouton
-    if (e.target.closest("button")) {
-      e.preventDefault();
-      return;
-    }
-    e.dataTransfer.effectAllowed = "move";
-    e.dataTransfer.setData("text/plain", JSON.stringify({
-      type: "hp4-actor-move",
-      actorId: card.dataset.id,
-      sourceYear: card.dataset.sourceYear,
-      sourceHouse: card.dataset.sourceHouse,
-    }));
-    setTimeout(() => card.classList.add("dragging"), 0);
-  });
-  card.addEventListener("dragend", () => card.classList.remove("dragging"));
-});
-    // Drop sur chaque zone de maison
+      card.addEventListener("dragstart", (e) => {
+        if (e.target.closest("button")) { e.preventDefault(); return; }
+        e.dataTransfer.effectAllowed = "move";
+        e.dataTransfer.setData("text/plain", JSON.stringify({
+          type: "hp4-actor-move",
+          actorId: card.dataset.id,
+          sourceYear: card.dataset.sourceYear,
+          sourceHouse: card.dataset.sourceHouse,
+        }));
+        setTimeout(() => card.classList.add("dragging"), 0);
+      });
+      card.addEventListener("dragend", () => card.classList.remove("dragging"));
+    });
+
+    // Drop zones
     this.element.querySelectorAll(".hp4-house-drop").forEach(zone => {
-      zone.addEventListener("dragover", e => {
-        e.preventDefault();
-        zone.classList.add("drag-over");
-      });
-
-      zone.addEventListener("dragleave", () => {
-        zone.classList.remove("drag-over");
-      });
-
+      zone.addEventListener("dragover", e => { e.preventDefault(); zone.classList.add("drag-over"); });
+      zone.addEventListener("dragleave", () => zone.classList.remove("drag-over"));
       zone.addEventListener("drop", async (e) => {
         e.preventDefault();
         zone.classList.remove("drag-over");
-
         const targetYear = zone.dataset.year;
         const targetHouse = zone.dataset.house;
-
         let raw;
-        try { raw = JSON.parse(e.dataTransfer.getData("text/plain")); }
-        catch { return; }
-
+        try { raw = JSON.parse(e.dataTransfer.getData("text/plain")); } catch { return; }
         const classData = ClassesApp.getClassData();
 
-        // Cas 1 : déplacement d'une carte existante entre maisons
         if (raw.type === "hp4-actor-move") {
           const { actorId, sourceYear, sourceHouse } = raw;
           const sourceKey = `${sourceYear}-${sourceHouse}`;
           const targetKey = `${targetYear}-${targetHouse}`;
-
           if (sourceKey === targetKey) return;
-
           classData[sourceKey] = (classData[sourceKey] ?? []).filter(id => id !== actorId);
-
-          const targetList = classData[targetKey] ?? [];
-          if (!targetList.includes(actorId)) {
-            targetList.push(actorId);
-            classData[targetKey] = targetList;
-          }
-
+          const list = classData[targetKey] ?? [];
+          if (!list.includes(actorId)) { list.push(actorId); classData[targetKey] = list; }
           await ClassesApp.saveClassData(classData);
           this.render();
           return;
         }
 
-        // Cas 2 : nouvel acteur depuis le répertoire Foundry
         if (raw.type !== "Actor") return;
         const actorId = raw.uuid?.split(".").pop() ?? raw.id;
         const targetKey = `${targetYear}-${targetHouse}`;
         const list = classData[targetKey] ?? [];
         if (!list.includes(actorId)) {
-          list.push(actorId);
-          classData[targetKey] = list;
+          list.push(actorId); classData[targetKey] = list;
           await ClassesApp.saveClassData(classData);
           this.render();
         }
@@ -262,12 +279,27 @@ export class ClassesApp extends HandlebarsApplicationMixin(ApplicationV2) {
           content: `<p>Retirer <strong>${actor?.name ?? "cet élève"}</strong> de cette maison ?</p>`,
         });
         if (!confirmed) return;
-        const storageKey = `${yearKey}-${houseKey}`;
         const classData = ClassesApp.getClassData();
-        classData[storageKey] = (classData[storageKey] ?? []).filter(id => id !== actorId);
+        classData[`${yearKey}-${houseKey}`] = (classData[`${yearKey}-${houseKey}`] ?? []).filter(id => id !== actorId);
         await ClassesApp.saveClassData(classData);
         this.render();
       });
+    });
+  }
+
+  async #promptYear(current) {
+    const { DialogV2 } = foundry.applications.api;
+    return DialogV2.wait({
+      window: { title: "Année scolaire" },
+      content: `<label style="font-size:0.85rem">Nom de l'année
+        <input type="text" id="hp4-year-input" value="${current.replace(/"/g, "&quot;")}"
+          placeholder="ex: 1992-1993" style="width:100%;margin-top:0.4rem">
+      </label>`,
+      buttons: [
+        { action: "ok", label: "Valider", default: true, callback: () => document.getElementById("hp4-year-input")?.value.trim() || null },
+        { action: "cancel", label: "Annuler", callback: () => null }
+      ],
+      rejectClose: false
     });
   }
 }

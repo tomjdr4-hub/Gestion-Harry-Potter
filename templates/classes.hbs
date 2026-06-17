@@ -1,17 +1,35 @@
 <div class="hp4-root">
   <div class="hp4-classes-wrapper">
+
     {{#if isGM}}
     <div class="hp4-classes-header">
-      <span class="hp4-school-year-label">
-        <i class="fas fa-graduation-cap"></i>
-        {{#if schoolYear}}{{schoolYear}}{{else}}<em>Année scolaire non définie</em>{{/if}}
-      </span>
-      <button type="button" class="hp4-edit-year-btn" title="Modifier l'année scolaire">
-        <i class="fas fa-pen"></i>
-      </button>
-      <button type="button" class="hp4-advance-year-btn" title="Passer à l'année suivante">
-        <i class="fas fa-forward-step"></i> Nouvelle année
-      </button>
+      {{#if currentYear}}
+        <i class="fas fa-graduation-cap hp4-year-icon"></i>
+        <select class="hp4-year-select">
+          {{#each yearsList}}
+            <option value="{{this}}" {{#if (eq this ../viewingYear)}}selected{{/if}}>
+              {{#if (eq this ../currentYear)}}★ {{/if}}{{this}}
+            </option>
+          {{/each}}
+        </select>
+        <button type="button" class="hp4-edit-year-btn" title="Renommer l'année courante">
+          <i class="fas fa-pen"></i>
+        </button>
+        {{#if isCurrentYear}}
+          <button type="button" class="hp4-advance-year-btn">
+            <i class="fas fa-forward-step"></i> Nouvelle année
+          </button>
+        {{else}}
+          <span class="hp4-readonly-badge"><i class="fas fa-lock"></i> Lecture seule</span>
+        {{/if}}
+      {{else}}
+        <span class="hp4-school-year-label">
+          <i class="fas fa-graduation-cap"></i> <em>Aucune année scolaire définie</em>
+        </span>
+        <button type="button" class="hp4-init-year-btn">
+          <i class="fas fa-calendar-plus"></i> Initialiser
+        </button>
+      {{/if}}
     </div>
     {{/if}}
 
@@ -34,12 +52,15 @@
               </h4>
               <div class="hp4-actors-grid">
                 {{#each (lookup ../actors key)}}
-                  <div class="hp4-actor-card" data-id="{{id}}" draggable="true"
-     data-source-year="{{../../yearKey}}"
-     data-source-house="{{../key}}">
+                  <div class="hp4-actor-card" data-id="{{id}}"
+                    {{#if ../../../../canEdit}}
+                      draggable="true"
+                      data-source-year="{{../../yearKey}}"
+                      data-source-house="{{../key}}"
+                    {{/if}}>
                     <img src="{{img}}" alt="{{name}}" draggable="false" />
                     <span>{{name}}</span>
-                    {{#if ../../../../isGM}}
+                    {{#if ../../../../canEdit}}
                       <button type="button" class="hp4-remove-actor"
                               data-id="{{id}}"
                               data-year="{{../../yearKey}}"
@@ -64,7 +85,7 @@
             </div>
             {{/each}}
           </div>
-          {{#if ../isGM}}
+          {{#if ../canEdit}}
             <p class="hp4-hint"><i class="fas fa-info-circle"></i> Glissez des acteurs dans une maison</p>
           {{/if}}
         </div>
