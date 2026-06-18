@@ -1,0 +1,107 @@
+<div class="hp4-root">
+  <div class="hp4-ens-wrapper">
+
+    {{#if (eq view "list")}}
+
+      <div class="hp4-ens-header">
+        <h2><i class="fas fa-chalkboard-teacher"></i> Matières</h2>
+        {{#if isGM}}
+          <button type="button" class="hp4-matiere-create">
+            <i class="fas fa-plus"></i> Ajouter une matière
+          </button>
+        {{/if}}
+      </div>
+
+      {{#if matieres.length}}
+        <div class="hp4-matieres-grid">
+          {{#each matieres}}
+            <div class="hp4-matiere-card" data-id="{{id}}">
+              {{#if isGM}}
+                <button type="button" class="hp4-matiere-delete" data-id="{{id}}" title="Supprimer">
+                  <i class="fas fa-trash"></i>
+                </button>
+              {{/if}}
+              {{#if professorImg}}
+                <img class="hp4-matiere-prof-img" src="{{professorImg}}" alt="{{professorName}}" />
+              {{else}}
+                <div class="hp4-matiere-prof-placeholder"><i class="fas fa-user-slash"></i></div>
+              {{/if}}
+              <div class="hp4-matiere-name">{{name}}</div>
+              <div class="hp4-matiere-meta">
+                {{#if professorName}}
+                  <span><i class="fas fa-user-tie"></i> {{professorName}}</span>
+                {{else}}
+                  <span class="hp4-no-prof">Aucun professeur</span>
+                {{/if}}
+                <span><i class="fas fa-book"></i> {{itemCount}} cours</span>
+              </div>
+            </div>
+          {{/each}}
+        </div>
+      {{else}}
+        <p class="hp4-empty hp4-ens-empty">Aucune matière. {{#if isGM}}Cliquez sur « Ajouter une matière » pour commencer.{{/if}}</p>
+      {{/if}}
+
+    {{else}}
+
+      <div class="hp4-ens-detail-header">
+        <button type="button" class="hp4-back-btn"><i class="fas fa-arrow-left"></i> Retour</button>
+        <h2>{{name}}</h2>
+        {{#if isGM}}
+          <button type="button" class="hp4-matiere-rename" title="Renommer"><i class="fas fa-pen"></i></button>
+        {{/if}}
+      </div>
+
+      <div class="hp4-ens-body">
+
+        <!-- Professeur -->
+        <div class="hp4-ens-section">
+          <h3><i class="fas fa-user-tie"></i> Professeur</h3>
+          <div class="hp4-prof-drop{{#unless isGM}} hp4-prof-drop--readonly{{/unless}}">
+            {{#if professor}}
+              <div class="hp4-prof-card">
+                <img class="hp4-prof-portrait" src="{{professor.img}}" alt="{{professor.name}}" title="Ouvrir la fiche" />
+                <span class="hp4-prof-name">{{professor.name}}</span>
+                {{#if isGM}}
+                  <button type="button" class="hp4-remove-prof" title="Retirer le professeur">
+                    <i class="fas fa-times"></i>
+                  </button>
+                {{/if}}
+              </div>
+            {{else}}
+              <p class="hp4-drop-hint"><i class="fas fa-user-plus"></i> Glissez un acteur ici</p>
+            {{/if}}
+          </div>
+        </div>
+
+        <!-- Cours appris -->
+        <div class="hp4-ens-section hp4-ens-section--grow">
+          <h3><i class="fas fa-scroll"></i> Cours appris</h3>
+          <div class="hp4-items-drop{{#unless isGM}} hp4-items-drop--readonly{{/unless}}">
+            {{#each items}}
+              <div class="hp4-item-row">
+                <img src="{{img}}" alt="{{name}}" class="hp4-item-img" />
+                <span class="hp4-item-name">{{name}}</span>
+                {{#if ../isGM}}
+                  <button type="button" class="hp4-remove-item" data-uuid="{{uuid}}" title="Retirer">
+                    <i class="fas fa-times"></i>
+                  </button>
+                {{/if}}
+              </div>
+            {{else}}
+              <p class="hp4-drop-hint">
+                {{#if isGM}}<i class="fas fa-plus-circle"></i> Glissez des équipements ici{{else}}Aucun cours enregistré{{/if}}
+              </p>
+            {{/each}}
+          </div>
+          {{#if isGM}}
+            <p class="hp4-hint"><i class="fas fa-info-circle"></i> Glissez des équipements depuis la sidebar</p>
+          {{/if}}
+        </div>
+
+      </div>
+
+    {{/if}}
+
+  </div>
+</div>

@@ -62,6 +62,9 @@ Hooks.once("init", function () {
   game.settings.register(MODULE_ID, "prefets-viewing-year", {
     scope: "world", config: false, type: String, default: ""
   });
+  game.settings.register(MODULE_ID, "enseignants-data", {
+    scope: "world", config: false, type: Object, default: {}
+  });
 });
 
 Hooks.once("ready", function () {

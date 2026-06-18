@@ -5,11 +5,12 @@ import { HouseCupApp } from "./houseCupApp.js";
 import { ClubsApp } from "./clubsApp.js";
 import { TimetableApp } from "./timetableApp.js";
 import { PrefetsApp } from "./prefetsApp.js";
+import { EnseignantsApp } from "./enseignantsApp.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
 // Instances singleton — une seule fenêtre ouverte par app
-let _classes, _timetable, _npcs, _houseCup, _clubs, _prefets;
+let _classes, _timetable, _npcs, _houseCup, _clubs, _prefets, _enseignants;
 
 function openSingleton(ref, Cls) {
   if (!ref || !ref.rendered) ref = new Cls();
@@ -46,6 +47,8 @@ export class GestionHarryPotterApp extends HandlebarsApplicationMixin(Applicatio
     this.element.querySelector("[data-action='open-clubs']")
       ?.addEventListener("click", () => { _clubs    = openSingleton(_clubs,    ClubsApp);    });
     this.element.querySelector("[data-action='open-prefets']")
-      ?.addEventListener("click", () => { _prefets  = openSingleton(_prefets,  PrefetsApp);  });
+      ?.addEventListener("click", () => { _prefets      = openSingleton(_prefets,      PrefetsApp);      });
+    this.element.querySelector("[data-action='open-enseignants']")
+      ?.addEventListener("click", () => { _enseignants  = openSingleton(_enseignants,  EnseignantsApp);  });
   }
 }
