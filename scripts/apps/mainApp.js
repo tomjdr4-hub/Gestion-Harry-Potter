@@ -6,48 +6,46 @@ import { ClubsApp } from "./clubsApp.js";
 import { TimetableApp } from "./timetableApp.js";
 import { PrefetsApp } from "./prefetsApp.js";
 
-
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
+
+// Instances singleton — une seule fenêtre ouverte par app
+let _classes, _timetable, _npcs, _houseCup, _clubs, _prefets;
+
+function openSingleton(ref, Cls) {
+  if (!ref || !ref.rendered) ref = new Cls();
+  ref.render(true);
+  return ref;
+}
 
 export class GestionHarryPotterApp extends HandlebarsApplicationMixin(ApplicationV2) {
   static DEFAULT_OPTIONS = {
     id: "gestion-harry-potter-app",
     classes: ["hp4-main"],
-    window: {
-      title: "Gestion Harry Potter",
-      resizable: true,
-    },
-    position: {
-      width: 700,
-      height: "auto",
-    },
+    window: { title: "Gestion Harry Potter", resizable: true },
+    position: { width: 700, height: "auto" },
   };
 
   static PARTS = {
-    main: {
-      template: "modules/gestion-harry-potter/templates/main.hbs",
-    },
+    main: { template: "modules/gestion-harry-potter/templates/main.hbs" },
   };
 
   async _prepareContext() {
-    return {
-      moduleId: MODULE_ID,
-    };
+    return { moduleId: MODULE_ID };
   }
 
   _onRender(context, options) {
     super._onRender(context, options);
     this.element.querySelector("[data-action='open-classes']")
-      ?.addEventListener("click", () => new ClassesApp().render(true));
+      ?.addEventListener("click", () => { _classes  = openSingleton(_classes,  ClassesApp);  });
     this.element.querySelector("[data-action='open-timetable']")
-      ?.addEventListener("click", () => new TimetableApp().render(true));
+      ?.addEventListener("click", () => { _timetable = openSingleton(_timetable, TimetableApp); });
     this.element.querySelector("[data-action='open-npcs']")
-      ?.addEventListener("click", () => new NpcsApp().render(true));
+      ?.addEventListener("click", () => { _npcs     = openSingleton(_npcs,     NpcsApp);     });
     this.element.querySelector("[data-action='open-house-cup']")
-      ?.addEventListener("click", () => new HouseCupApp().render(true));
+      ?.addEventListener("click", () => { _houseCup = openSingleton(_houseCup, HouseCupApp); });
     this.element.querySelector("[data-action='open-clubs']")
-      ?.addEventListener("click", () => new ClubsApp().render(true));
+      ?.addEventListener("click", () => { _clubs    = openSingleton(_clubs,    ClubsApp);    });
     this.element.querySelector("[data-action='open-prefets']")
-      ?.addEventListener("click", () => new PrefetsApp().render(true));
+      ?.addEventListener("click", () => { _prefets  = openSingleton(_prefets,  PrefetsApp);  });
   }
 }
