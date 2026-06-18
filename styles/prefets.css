@@ -7,11 +7,28 @@
   overflow: hidden;
 }
 
-/* Grille 2x2 (plus de place par maison que le 4-colonnes de Classes) */
 .hp4-prefets-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: 1fr 1fr;
   gap: 0.75rem;
   flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Chaque zone maison occupe sa cellule et clippe le contenu */
+.hp4-prefets-grid .hp4-house-zone {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* Les acteurs scrollent à l'intérieur de leur zone si besoin */
+.hp4-prefets-grid .hp4-actors-grid {
   overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  align-content: flex-start;
 }
