@@ -106,8 +106,11 @@ export class FicheApp extends HandlebarsApplicationMixin(ApplicationV2) {
         e.preventDefault();
         zone.classList.remove("drag-over");
         let data;
-        try { data = JSON.parse(e.dataTransfer.getData("text/plain")); } catch { return; }
-        if (data.type !== "Actor") return;
+        try {
+          const text = e.dataTransfer.getData("text/plain") || e.dataTransfer.getData("application/json");
+          data = JSON.parse(text);
+        } catch { return; }
+        if (data.type !== "Actor" && data.documentName !== "Actor") return;
         const droppedId = data.uuid?.split(".").pop() ?? data.id;
         if (!droppedId || droppedId === actorId) return;
         const rel = zone.dataset.rel;

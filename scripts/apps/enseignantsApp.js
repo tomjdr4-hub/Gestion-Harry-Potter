@@ -165,8 +165,11 @@ export class EnseignantsApp extends HandlebarsApplicationMixin(ApplicationV2) {
         e.preventDefault();
         itemsDrop.classList.remove("drag-over");
         let data;
-        try { data = JSON.parse(e.dataTransfer.getData("text/plain")); } catch { return; }
-        if (data.type !== "Item") return;
+        try {
+          const text = e.dataTransfer.getData("text/plain") || e.dataTransfer.getData("application/json");
+          data = JSON.parse(text);
+        } catch { return; }
+        if (data.type !== "Item" && data.documentName !== "Item") return;
         const uuid = data.uuid;
         if (!uuid) return;
         const item = await fromUuid(uuid).catch(() => null);
@@ -205,8 +208,11 @@ export class EnseignantsApp extends HandlebarsApplicationMixin(ApplicationV2) {
       e.preventDefault();
       zone.classList.remove("drag-over");
       let data;
-      try { data = JSON.parse(e.dataTransfer.getData("text/plain")); } catch { return; }
-      if (data.type !== "Actor") return;
+      try {
+        const text = e.dataTransfer.getData("text/plain") || e.dataTransfer.getData("application/json");
+        data = JSON.parse(text);
+      } catch { return; }
+      if (data.type !== "Actor" && data.documentName !== "Actor") return;
       const actorId = data.uuid?.split(".").pop() ?? data.id;
       if (actorId) await callback(actorId);
     });

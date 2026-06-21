@@ -251,7 +251,10 @@ export class ClassesApp extends HandlebarsApplicationMixin(ApplicationV2) {
         const targetYear = zone.dataset.year;
         const targetHouse = zone.dataset.house;
         let raw;
-        try { raw = JSON.parse(e.dataTransfer.getData("text/plain")); } catch { return; }
+        try {
+          const text = e.dataTransfer.getData("text/plain") || e.dataTransfer.getData("application/json");
+          raw = JSON.parse(text);
+        } catch { return; }
         const classData = ClassesApp.getClassData();
 
         if (raw.type === "hp4-actor-move") {
@@ -267,7 +270,7 @@ export class ClassesApp extends HandlebarsApplicationMixin(ApplicationV2) {
           return;
         }
 
-        if (raw.type !== "Actor") return;
+        if (raw.type !== "Actor" && raw.documentName !== "Actor") return;
         const actorId = raw.uuid?.split(".").pop() ?? raw.id;
         const targetKey = `${targetYear}-${targetHouse}`;
         const list = classData[targetKey] ?? [];

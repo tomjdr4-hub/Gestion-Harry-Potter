@@ -226,8 +226,11 @@ export class ClubsApp extends HandlebarsApplicationMixin(ApplicationV2) {
           e.preventDefault();
           journalLinkDrop.classList.remove("drag-over");
           let data;
-          try { data = JSON.parse(e.dataTransfer.getData("text/plain")); } catch { return; }
-          if (data.type !== "JournalEntry") return;
+          try {
+            const text = e.dataTransfer.getData("text/plain") || e.dataTransfer.getData("application/json");
+            data = JSON.parse(text);
+          } catch { return; }
+          if (data.type !== "JournalEntry" && data.documentName !== "JournalEntry") return;
           const journalId = data.uuid?.split(".").pop() ?? data.id;
           const clubs = ClubsApp.getClubsData();
           clubs[clubId].journalId = journalId;
@@ -281,8 +284,11 @@ export class ClubsApp extends HandlebarsApplicationMixin(ApplicationV2) {
       e.preventDefault();
       zone.classList.remove("drag-over");
       let data;
-      try { data = JSON.parse(e.dataTransfer.getData("text/plain")); } catch { return; }
-      if (data.type !== "Actor") return;
+      try {
+        const text = e.dataTransfer.getData("text/plain") || e.dataTransfer.getData("application/json");
+        data = JSON.parse(text);
+      } catch { return; }
+      if (data.type !== "Actor" && data.documentName !== "Actor") return;
       const actorId = data.uuid?.split(".").pop() ?? data.id;
       await callback(actorId);
     });
