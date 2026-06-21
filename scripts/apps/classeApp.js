@@ -100,7 +100,7 @@ export class ClassesApp extends HandlebarsApplicationMixin(ApplicationV2) {
     const viewingYear = this.#viewingYear ?? currentYear;
     const classData = (store.years ?? {})[viewingYear] ?? {};
     const isGM = game.user.isGM;
-    const canEdit = isGM && viewingYear === currentYear;
+    const canEdit = isGM;
 
     const allYears = Object.keys(store.years ?? {});
     const yearsList = [currentYear, ...allYears.filter(y => y !== currentYear).reverse()].filter(Boolean);
