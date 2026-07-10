@@ -65,6 +65,9 @@ Hooks.once("init", function () {
   game.settings.register(MODULE_ID, "enseignants-data", {
     scope: "world", config: false, type: Object, default: {}
   });
+  game.settings.register(MODULE_ID, "quidditch-data", {
+    scope: "world", config: false, type: Object, default: {}
+  });
 });
 
 Hooks.once("ready", function () {
