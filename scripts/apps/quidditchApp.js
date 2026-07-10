@@ -59,6 +59,10 @@ export class QuidditchApp extends HandlebarsApplicationMixin(ApplicationV2) {
     catch { return {}; }
   }
   static async saveStore(store) {
+    if (!game.user.isGM) {
+      console.warn("[HP4-Quidditch] saveStore appelé par un non-MJ :", game.user.name, new Error().stack);
+      return;
+    }
     await game.settings.set(MODULE_ID, "quidditch-data", store);
   }
 
