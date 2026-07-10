@@ -152,10 +152,13 @@ export class QuidditchApp extends HandlebarsApplicationMixin(ApplicationV2) {
           effects.push({ desc: `${POSTE_LABEL[pos]} (${selfTeam.name}) → ${e.label} ${targetName} ${delta >= 0 ? "+" : ""}${delta}`, gaugeKey: e.gauge, teamKey: targetKey, delta });
         }
       };
-      push(cA.p1, teamA, teamB, "A");
-      push(cA.p2, teamA, teamB, "A");
-      push(cB.p1, teamB, teamA, "B");
-      push(cB.p2, teamB, teamA, "B");
+      if (winKey === "A") {
+        push(cA.p1, teamA, teamB, "A");
+        push(cA.p2, teamA, teamB, "A");
+      } else if (winKey === "B") {
+        push(cB.p1, teamB, teamA, "B");
+        push(cB.p2, teamB, teamA, "B");
+      }
 
       // Jauges projetées
       const pA = { quaffle: teamA.quaffle, vifDor: teamA.vifDor };

@@ -174,7 +174,7 @@
     <div class="quid-roll-area">
       <div class="quid-roll-block">
         <div class="quid-roll-title">{{teamA.name}}</div>
-        {{#if (eq rollA null)}}
+        {{#unless rollA}}
           {{#if isTeamA}}
             <button class="quid-roll-a quid-btn-roll" type="button">Lancer 1D6</button>
             <div class="quid-manual-row">
@@ -186,11 +186,11 @@
           {{/if}}
         {{else}}
           <span class="quid-roll-result">🎲 {{rollA}} <span class="quid-bonus">(+{{bonusA}} = {{totA}})</span></span>
-        {{/if}}
+        {{/unless}}
       </div>
       <div class="quid-roll-block">
         <div class="quid-roll-title">{{teamB.name}}</div>
-        {{#if (eq rollB null)}}
+        {{#unless rollB}}
           {{#if isTeamB}}
             <button class="quid-roll-b quid-btn-roll" type="button">Lancer 1D6</button>
             <div class="quid-manual-row">
@@ -202,7 +202,7 @@
           {{/if}}
         {{else}}
           <span class="quid-roll-result">🎲 {{rollB}} <span class="quid-bonus">(+{{bonusB}} = {{totB}})</span></span>
-        {{/if}}
+        {{/unless}}
       </div>
     </div>
 
