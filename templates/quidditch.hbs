@@ -1,199 +1,262 @@
 <div class="hp4-root">
 <div class="quid-wrapper">
 
-{{!-- ══════════════════════ SETUP ══════════════════════ --}}
+{{!-- ═══ SETUP ═══ --}}
 {{#if (eq phase "setup")}}
   <div class="quid-setup">
-    <div class="quid-logo"><i class="fas fa-broom"></i> QUIDDITCH</div>
-    <p class="quid-setup-sub">Entrez les noms des deux équipes pour commencer</p>
-    <div class="quid-team-inputs">
-      <div class="quid-team-slot">
-        <label class="quid-team-a">Équipe A</label>
-        <input type="text" id="quid-name-a" value="Gryffondor" placeholder="Nom équipe A" />
+    <h3 class="quid-setup-title">Nouvelle partie de Quidditch</h3>
+    <div class="quid-teams-setup">
+
+      <div class="quid-team-setup quid-team-a">
+        <label>Nom équipe A</label>
+        <input id="quid-name-a" type="text" value="{{teamA.name}}" placeholder="Équipe A" />
+        <label>Joueur (glisser un acteur)</label>
+        <div class="quid-drop-a quid-actor-drop {{#if teamA.actorName}}quid-drop-filled{{/if}}">
+          {{#if teamA.actorName}}
+            {{#if teamA.actorImg}}<img src="{{teamA.actorImg}}" class="quid-actor-img" />{{/if}}
+            <span class="quid-actor-name">{{teamA.actorName}}</span>
+            {{#if isGM}}<button class="quid-remove-a quid-remove-btn" type="button">✕</button>{{/if}}
+          {{else}}
+            <span class="quid-drop-hint">Glisser un acteur ici</span>
+          {{/if}}
+        </div>
       </div>
-      <div class="quid-vs-badge">VS</div>
-      <div class="quid-team-slot">
-        <label class="quid-team-b">Équipe B</label>
-        <input type="text" id="quid-name-b" value="Serpentard" placeholder="Nom équipe B" />
+
+      <div class="quid-vs">VS</div>
+
+      <div class="quid-team-setup quid-team-b">
+        <label>Nom équipe B</label>
+        <input id="quid-name-b" type="text" value="{{teamB.name}}" placeholder="Équipe B" />
+        <label>Joueur (glisser un acteur)</label>
+        <div class="quid-drop-b quid-actor-drop {{#if teamB.actorName}}quid-drop-filled{{/if}}">
+          {{#if teamB.actorName}}
+            {{#if teamB.actorImg}}<img src="{{teamB.actorImg}}" class="quid-actor-img" />{{/if}}
+            <span class="quid-actor-name">{{teamB.actorName}}</span>
+            {{#if isGM}}<button class="quid-remove-b quid-remove-btn" type="button">✕</button>{{/if}}
+          {{else}}
+            <span class="quid-drop-hint">Glisser un acteur ici</span>
+          {{/if}}
+        </div>
       </div>
+
     </div>
-    {{#if isGM}}<button type="button" class="quid-start quid-btn-primary"><i class="fas fa-play"></i> Commencer</button>{{/if}}
+
+    {{#if isGM}}
+      <button class="quid-start {{#unless readyToStart}}quid-btn-disabled{{/unless}}" type="button"
+        {{#unless readyToStart}}disabled{{/unless}}>Commencer le match</button>
+    {{else}}
+      <p class="quid-waiting">En attente du MJ…</p>
+    {{/if}}
   </div>
 
-{{!-- ══════════════════════ CHOOSE ══════════════════════ --}}
+{{!-- ═══ CHOOSE ═══ --}}
 {{else if (eq phase "choose")}}
-
-  <div class="quid-gauges-bar">
-    <div class="quid-gauge-team">
-      <div class="quid-gauge-name quid-team-a">{{teamA.name}}</div>
-      <div class="quid-gauge-row">
-        <span class="quid-gauge-icon quid-icon-quaffle"><i class="fas fa-circle"></i></span>
-        <div class="quid-gauge-track"><div class="quid-gauge-fill quid-fill-quaffle" style="width:{{gauges.aQuaffle}}%"></div></div>
-        <span class="quid-gauge-pct">{{gauges.aQuaffle}}%</span>
-      </div>
-      <div class="quid-gauge-row">
-        <span class="quid-gauge-icon quid-icon-vifDor"><i class="fas fa-star"></i></span>
-        <div class="quid-gauge-track"><div class="quid-gauge-fill quid-fill-vifDor" style="width:{{gauges.aVifDor}}%"></div></div>
-        <span class="quid-gauge-pct">{{gauges.aVifDor}}%</span>
-      </div>
-    </div>
-    <div class="quid-round-badge">Tour {{round}}</div>
-    <div class="quid-gauge-team">
-      <div class="quid-gauge-name quid-team-b">{{teamB.name}}</div>
-      <div class="quid-gauge-row">
-        <span class="quid-gauge-icon quid-icon-quaffle"><i class="fas fa-circle"></i></span>
-        <div class="quid-gauge-track"><div class="quid-gauge-fill quid-fill-quaffle" style="width:{{gauges.bQuaffle}}%"></div></div>
-        <span class="quid-gauge-pct">{{gauges.bQuaffle}}%</span>
-      </div>
-      <div class="quid-gauge-row">
-        <span class="quid-gauge-icon quid-icon-vifDor"><i class="fas fa-star"></i></span>
-        <div class="quid-gauge-track"><div class="quid-gauge-fill quid-fill-vifDor" style="width:{{gauges.bVifDor}}%"></div></div>
-        <span class="quid-gauge-pct">{{gauges.bVifDor}}%</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="quid-section-title">Choix des postes</div>
-  <div class="quid-choices">
-    <div class="quid-choice-row">
-      <div class="quid-team-label quid-team-a">{{teamA.name}}</div>
-      <select id="quid-p1a" class="quid-select">
-        <option value="">— Poste 1 —</option>
-        {{#each postes}}<option value="{{key}}" {{#if (eq key ../cA.p1)}}selected{{/if}}>{{label}}</option>{{/each}}
-      </select>
-      <select id="quid-p2a" class="quid-select">
-        <option value="">— Poste 2 —</option>
-        {{#each postes}}<option value="{{key}}" {{#if (eq key ../cA.p2)}}selected{{/if}}>{{label}}</option>{{/each}}
-      </select>
-    </div>
-    <div class="quid-choice-row">
-      <div class="quid-team-label quid-team-b">{{teamB.name}}</div>
-      <select id="quid-p1b" class="quid-select">
-        <option value="">— Poste 1 —</option>
-        {{#each postes}}<option value="{{key}}" {{#if (eq key ../cB.p1)}}selected{{/if}}>{{label}}</option>{{/each}}
-      </select>
-      <select id="quid-p2b" class="quid-select">
-        <option value="">— Poste 2 —</option>
-        {{#each postes}}<option value="{{key}}" {{#if (eq key ../cB.p2)}}selected{{/if}}>{{label}}</option>{{/each}}
-      </select>
-    </div>
-  </div>
-
-  <div class="quid-ref">
-    <span class="quid-ref-title">Hiérarchie :</span>
-    <span>Gardien &gt; Poursuiveur &gt; Batteur &gt; Attrapeur &gt; Gardien</span>
-    <span class="quid-ref-neutral">Neutre : Gardien/Batteur · Attrapeur/Poursuiveur</span>
-  </div>
-
-  {{#if isGM}}
-    <div class="quid-actions">
-      <button type="button" class="quid-reset-btn quid-btn-ghost"><i class="fas fa-redo"></i> Réinitialiser</button>
-      <button type="button" class="quid-reveal-btn quid-btn-primary"><i class="fas fa-eye"></i> Révéler les choix</button>
-    </div>
-  {{/if}}
-
-{{!-- ══════════════════════ REVEAL ══════════════════════ --}}
-{{else}}
-
-  <div class="quid-gauges-bar">
-    <div class="quid-gauge-team">
-      <div class="quid-gauge-name quid-team-a">{{teamA.name}}</div>
-      <div class="quid-gauge-row">
-        <span class="quid-gauge-icon quid-icon-quaffle"><i class="fas fa-circle"></i></span>
-        <div class="quid-gauge-track"><div class="quid-gauge-fill quid-fill-quaffle" style="width:{{gauges.aQuaffle}}%"></div></div>
-        <span class="quid-gauge-pct">{{gauges.aQuaffle}}%</span>
-      </div>
-      <div class="quid-gauge-row">
-        <span class="quid-gauge-icon quid-icon-vifDor"><i class="fas fa-star"></i></span>
-        <div class="quid-gauge-track"><div class="quid-gauge-fill quid-fill-vifDor" style="width:{{gauges.aVifDor}}%"></div></div>
-        <span class="quid-gauge-pct">{{gauges.aVifDor}}%</span>
-      </div>
-    </div>
-    <div class="quid-round-badge">Tour {{round}}</div>
-    <div class="quid-gauge-team">
-      <div class="quid-gauge-name quid-team-b">{{teamB.name}}</div>
-      <div class="quid-gauge-row">
-        <span class="quid-gauge-icon quid-icon-quaffle"><i class="fas fa-circle"></i></span>
-        <div class="quid-gauge-track"><div class="quid-gauge-fill quid-fill-quaffle" style="width:{{gauges.bQuaffle}}%"></div></div>
-        <span class="quid-gauge-pct">{{gauges.bQuaffle}}%</span>
-      </div>
-      <div class="quid-gauge-row">
-        <span class="quid-gauge-icon quid-icon-vifDor"><i class="fas fa-star"></i></span>
-        <div class="quid-gauge-track"><div class="quid-gauge-fill quid-fill-vifDor" style="width:{{gauges.bVifDor}}%"></div></div>
-        <span class="quid-gauge-pct">{{gauges.bVifDor}}%</span>
-      </div>
-    </div>
-  </div>
-
-  {{!-- Confrontation --}}
-  <div class="quid-section-title">Confrontation des postes</div>
-  <div class="quid-conf-grid">
-    <div class="quid-poste-badge quid-team-a-bg">{{cA.p1L}}</div>
-    <div class="quid-conf-mid">Poste 1</div>
-    <div class="quid-poste-badge quid-team-b-bg">{{cB.p1L}}</div>
-    <div class="quid-result-cell {{v1C}}">{{v1L}}</div>
-
-    <div class="quid-poste-badge quid-team-a-bg">{{cA.p2L}}</div>
-    <div class="quid-conf-mid">Poste 2</div>
-    <div class="quid-poste-badge quid-team-b-bg">{{cB.p2L}}</div>
-    <div class="quid-result-cell {{v2C}}">{{v2L}}</div>
-  </div>
-  <div class="quid-bonus-line">
-    Bonus → <span class="quid-team-a">{{teamA.name}} +{{bonusA}}</span>
-    &nbsp;/&nbsp;
-    <span class="quid-team-b">{{teamB.name}} +{{bonusB}}</span>
-  </div>
-
-  {{!-- Lancers --}}
-  <div class="quid-section-title">Duel des dés (1D6 + bonus)</div>
-  <div class="quid-rolls">
-    <div class="quid-roll-row">
-      <span class="quid-team-label quid-team-a">{{teamA.name}}</span>
+  <div class="quid-choose">
+    <div class="quid-header-row">
+      <span class="quid-round-badge">Tour {{round}}</span>
       {{#if isGM}}
-        <button type="button" class="quid-roll-a quid-btn-dice" title="Lancer 1D6"><i class="fas fa-dice"></i></button>
-        <input type="number" id="quid-input-a" class="quid-roll-input" min="1" max="6" {{#if rollA}}value="{{rollA}}"{{/if}} placeholder="?" />
-        <button type="button" class="quid-set-a quid-btn-sm">✓</button>
-      {{else}}
-        <span class="quid-roll-display">{{#if rollA}}{{rollA}}{{else}}?{{/if}}</span>
+        <button class="quid-force-reveal quid-btn-sm" type="button">Forcer révélation</button>
+        <button class="quid-reset-btn quid-btn-sm quid-btn-danger" type="button">Réinitialiser</button>
       {{/if}}
-      <span class="quid-roll-eq">+ {{bonusA}} = <strong class="{{#if totA}}quid-total-set{{/if}}">{{#if totA}}{{totA}}{{else}}?{{/if}}</strong></span>
     </div>
-    <div class="quid-roll-row">
-      <span class="quid-team-label quid-team-b">{{teamB.name}}</span>
-      {{#if isGM}}
-        <button type="button" class="quid-roll-b quid-btn-dice" title="Lancer 1D6"><i class="fas fa-dice"></i></button>
-        <input type="number" id="quid-input-b" class="quid-roll-input" min="1" max="6" {{#if rollB}}value="{{rollB}}"{{/if}} placeholder="?" />
-        <button type="button" class="quid-set-b quid-btn-sm">✓</button>
-      {{else}}
-        <span class="quid-roll-display">{{#if rollB}}{{rollB}}{{else}}?{{/if}}</span>
-      {{/if}}
-      <span class="quid-roll-eq">+ {{bonusB}} = <strong class="{{#if totB}}quid-total-set{{/if}}">{{#if totB}}{{totB}}{{else}}?{{/if}}</strong></span>
-    </div>
-  </div>
 
-  {{#if duelReady}}
-    <div class="quid-duel-result {{#if duel.tie}}qw-n{{else}}quid-win-banner{{/if}}">
-      {{#if duel.tie}}Égalité — Écart : 0{{else}}⚡ {{duel.winName}} gagne · Écart : {{duel.ecart}}{{/if}}
+    <div class="quid-gauges">
+      <div class="quid-gauge-block">
+        <div class="quid-gauge-label">Souaffle</div>
+        <div class="quid-gauge-bar-wrap">
+          <div class="quid-gauge-bar quid-gauge-q-a" style="width:{{gauges.aQ}}%"></div>
+          <span class="quid-gauge-val quid-val-left">{{teamA.name}} {{gauges.aQ}}</span>
+          <span class="quid-gauge-val quid-val-right">{{teamB.name}} {{gauges.bQ}}</span>
+          <div class="quid-gauge-bar quid-gauge-q-b" style="width:{{gauges.bQ}}%; right:0; left:auto;"></div>
+        </div>
+      </div>
+      <div class="quid-gauge-block">
+        <div class="quid-gauge-label">Vif d'or <span class="quid-gauge-sub">(0–200)</span></div>
+        <div class="quid-gauge-bar-wrap">
+          <div class="quid-gauge-bar quid-gauge-v-a" style="width:{{pct gauges.aV 200}}%"></div>
+          <span class="quid-gauge-val quid-val-left">{{teamA.name}} {{gauges.aV}}</span>
+          <span class="quid-gauge-val quid-val-right">{{teamB.name}} {{gauges.bV}}</span>
+          <div class="quid-gauge-bar quid-gauge-v-b" style="width:{{pct gauges.bV 200}}%; right:0; left:auto;"></div>
+        </div>
+      </div>
     </div>
-    <div class="quid-effects">
-      {{#each duel.effects}}
-        <div class="quid-effect-row"><i class="fas fa-arrow-right"></i> {{desc}}</div>
-      {{/each}}
-    </div>
-    {{#if isGM}}
-      <div class="quid-actions">
-        <button type="button" class="quid-back-btn quid-btn-ghost"><i class="fas fa-arrow-left"></i> Modifier</button>
-        <button type="button" class="quid-apply-btn quid-btn-primary"><i class="fas fa-check"></i> Appliquer · Tour {{round}}</button>
+
+    {{#if isTeamA}}
+      <div class="quid-choice-panel quid-choice-a {{#if aLocked}}quid-locked{{/if}}">
+        <div class="quid-choice-team">{{teamA.name}}</div>
+        {{#if aLocked}}
+          <p class="quid-locked-msg">Postes soumis ✓ — En attente de l'adversaire…</p>
+        {{else}}
+          <div class="quid-choice-selects">
+            <div class="quid-select-wrap"><label>Poste 1</label>
+              <select id="quid-p1a"><option value="">— choisir —</option>
+                {{#each postes}}<option value="{{key}}">{{label}}</option>{{/each}}</select></div>
+            <div class="quid-select-wrap"><label>Poste 2</label>
+              <select id="quid-p2a"><option value="">— choisir —</option>
+                {{#each postes}}<option value="{{key}}">{{label}}</option>{{/each}}</select></div>
+          </div>
+          <button class="quid-lock-a quid-btn-lock" type="button">Valider mes postes</button>
+        {{/if}}
       </div>
     {{/if}}
-  {{else}}
-    {{#if isGM}}
-      <div class="quid-actions">
-        <button type="button" class="quid-back-btn quid-btn-ghost"><i class="fas fa-arrow-left"></i> Modifier les postes</button>
+
+    {{#if isTeamB}}
+      <div class="quid-choice-panel quid-choice-b {{#if bLocked}}quid-locked{{/if}}">
+        <div class="quid-choice-team">{{teamB.name}}</div>
+        {{#if bLocked}}
+          <p class="quid-locked-msg">Postes soumis ✓ — En attente de l'adversaire…</p>
+        {{else}}
+          <div class="quid-choice-selects">
+            <div class="quid-select-wrap"><label>Poste 1</label>
+              <select id="quid-p1b"><option value="">— choisir —</option>
+                {{#each postes}}<option value="{{key}}">{{label}}</option>{{/each}}</select></div>
+            <div class="quid-select-wrap"><label>Poste 2</label>
+              <select id="quid-p2b"><option value="">— choisir —</option>
+                {{#each postes}}<option value="{{key}}">{{label}}</option>{{/each}}</select></div>
+          </div>
+          <button class="quid-lock-b quid-btn-lock" type="button">Valider mes postes</button>
+        {{/if}}
       </div>
     {{/if}}
-  {{/if}}
 
+    <div class="quid-status-row">
+      <span class="quid-status-pill {{#if aLocked}}quid-status-ok{{/if}}">{{teamA.name}} {{#if aLocked}}✓ Prêt{{else}}…{{/if}}</span>
+      <span class="quid-status-pill {{#if bLocked}}quid-status-ok{{/if}}">{{teamB.name}} {{#if bLocked}}✓ Prêt{{else}}…{{/if}}</span>
+    </div>
+  </div>
+
+{{!-- ═══ REVEAL ═══ --}}
+{{else if (eq phase "reveal")}}
+  <div class="quid-reveal">
+    <div class="quid-header-row">
+      <span class="quid-round-badge">Tour {{round}} — Révélation</span>
+      {{#if isGM}}<button class="quid-back-btn quid-btn-sm" type="button">← Retour aux choix</button>{{/if}}
+    </div>
+
+    <div class="quid-gauges">
+      <div class="quid-gauge-block">
+        <div class="quid-gauge-label">Souaffle</div>
+        <div class="quid-gauge-bar-wrap">
+          <div class="quid-gauge-bar quid-gauge-q-a" style="width:{{gauges.aQ}}%"></div>
+          <span class="quid-gauge-val quid-val-left">{{teamA.name}} {{gauges.aQ}}</span>
+          <span class="quid-gauge-val quid-val-right">{{teamB.name}} {{gauges.bQ}}</span>
+          <div class="quid-gauge-bar quid-gauge-q-b" style="width:{{gauges.bQ}}%; right:0; left:auto;"></div>
+        </div>
+      </div>
+      <div class="quid-gauge-block">
+        <div class="quid-gauge-label">Vif d'or</div>
+        <div class="quid-gauge-bar-wrap">
+          <div class="quid-gauge-bar quid-gauge-v-a" style="width:{{pct gauges.aV 200}}%"></div>
+          <span class="quid-gauge-val quid-val-left">{{teamA.name}} {{gauges.aV}}</span>
+          <span class="quid-gauge-val quid-val-right">{{teamB.name}} {{gauges.bV}}</span>
+          <div class="quid-gauge-bar quid-gauge-v-b" style="width:{{pct gauges.bV 200}}%; right:0; left:auto;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="quid-conf-grid">
+      <div class="quid-conf-header quid-col-a">{{teamA.name}}</div>
+      <div class="quid-conf-header quid-col-mid">Résultat</div>
+      <div class="quid-conf-header quid-col-b">{{teamB.name}}</div>
+      <div class="quid-conf-poste quid-col-a">{{cA.p1L}}</div>
+      <div class="quid-conf-result {{v1C}} quid-col-mid">{{v1L}}</div>
+      <div class="quid-conf-poste quid-col-b">{{cB.p1L}}</div>
+      <div class="quid-conf-poste quid-col-a">{{cA.p2L}}</div>
+      <div class="quid-conf-result {{v2C}} quid-col-mid">{{v2L}}</div>
+      <div class="quid-conf-poste quid-col-b">{{cB.p2L}}</div>
+    </div>
+
+    <div class="quid-bonus-row">
+      <span>Bonus dés — {{teamA.name}} : +{{bonusA}}</span>
+      <span>{{teamB.name}} : +{{bonusB}}</span>
+    </div>
+
+    <div class="quid-roll-area">
+      <div class="quid-roll-block">
+        <div class="quid-roll-title">{{teamA.name}}</div>
+        {{#if (eq rollA null)}}
+          {{#if isTeamA}}
+            <button class="quid-roll-a quid-btn-roll" type="button">Lancer 1D6</button>
+            <div class="quid-manual-row">
+              <input id="quid-input-a" type="number" min="1" max="6" placeholder="1-6" />
+              <button class="quid-set-a quid-btn-sm" type="button">OK</button>
+            </div>
+          {{else}}
+            <span class="quid-wait">En attente du joueur…</span>
+          {{/if}}
+        {{else}}
+          <span class="quid-roll-result">🎲 {{rollA}} <span class="quid-bonus">(+{{bonusA}} = {{totA}})</span></span>
+        {{/if}}
+      </div>
+      <div class="quid-roll-block">
+        <div class="quid-roll-title">{{teamB.name}}</div>
+        {{#if (eq rollB null)}}
+          {{#if isTeamB}}
+            <button class="quid-roll-b quid-btn-roll" type="button">Lancer 1D6</button>
+            <div class="quid-manual-row">
+              <input id="quid-input-b" type="number" min="1" max="6" placeholder="1-6" />
+              <button class="quid-set-b quid-btn-sm" type="button">OK</button>
+            </div>
+          {{else}}
+            <span class="quid-wait">En attente du joueur…</span>
+          {{/if}}
+        {{else}}
+          <span class="quid-roll-result">🎲 {{rollB}} <span class="quid-bonus">(+{{bonusB}} = {{totB}})</span></span>
+        {{/if}}
+      </div>
+    </div>
+
+    {{#if duelReady}}
+      {{#if duel}}
+        <div class="quid-duel-banner {{#if duel.tie}}quid-tie{{else if (eq duel.winKey "A")}}quid-win-a{{else}}quid-win-b{{/if}}">
+          {{#if duel.tie}}Égalité — Aucun effet{{else}}{{duel.winName}} l'emporte — Écart : {{duel.ecart}}{{/if}}
+        </div>
+        {{#unless duel.tie}}
+          <ul class="quid-effects-list">
+            {{#each duel.effects}}<li>{{desc}}</li>{{/each}}
+          </ul>
+          <div class="quid-proj-row">
+            <span>{{teamA.name}} → Souaffle : {{duel.projA.quaffle}} / Vif d'or : {{duel.projA.vifDor}}</span>
+            <span>{{teamB.name}} → Souaffle : {{duel.projB.quaffle}} / Vif d'or : {{duel.projB.vifDor}}</span>
+          </div>
+          {{#if duel.endCheck}}
+            <div class="quid-end-warning">⚡ Condition de fin atteinte — Le match se terminera !</div>
+          {{/if}}
+        {{/unless}}
+        {{#if isGM}}
+          <button class="quid-apply-btn quid-btn-apply" type="button">Appliquer les effets</button>
+        {{/if}}
+      {{/if}}
+    {{/if}}
+  </div>
+
+{{!-- ═══ ENDED ═══ --}}
+{{else if (eq phase "ended")}}
+  <div class="quid-ended">
+    <div class="quid-victory-title">⚡ Fin du match !</div>
+    <div class="quid-vif-capture">🌟 {{captureTeamName}} capture le Vif d'or ! (+150 Souaffle)</div>
+    <div class="quid-final-scores">
+      <div class="quid-score-a">{{teamA.name}} : {{teamA.quaffle}} + {{#if (eq capture "A")}}150{{else}}0{{/if}} = <strong>{{finalA}} pts</strong></div>
+      <div class="quid-score-b">{{teamB.name}} : {{teamB.quaffle}} + {{#if (eq capture "B")}}150{{else}}0{{/if}} = <strong>{{finalB}} pts</strong></div>
+    </div>
+    {{#if isTie}}
+      <div class="quid-winner-banner quid-winner-tie">Match nul !</div>
+    {{else}}
+      <div class="quid-winner-banner quid-winner-win">🏆 {{winnerName}} remporte le match !</div>
+    {{/if}}
+    <div class="quid-gauges quid-gauges-final">
+      <div class="quid-gauge-block">
+        <div class="quid-gauge-label">Vif d'or (final)</div>
+        <div class="quid-gauge-bar-wrap">
+          <div class="quid-gauge-bar quid-gauge-v-a" style="width:{{pct teamA.vifDor 200}}%"></div>
+          <span class="quid-gauge-val quid-val-left">{{teamA.name}} {{teamA.vifDor}}</span>
+          <span class="quid-gauge-val quid-val-right">{{teamB.name}} {{teamB.vifDor}}</span>
+          <div class="quid-gauge-bar quid-gauge-v-b" style="width:{{pct teamB.vifDor 200}}%; right:0; left:auto;"></div>
+        </div>
+      </div>
+    </div>
+    {{#if isGM}}<button class="quid-reset-btn quid-btn-apply" type="button">Nouvelle partie</button>{{/if}}
+  </div>
 {{/if}}
 
 </div>

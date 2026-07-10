@@ -5,8 +5,9 @@ import { registerSidebar } from "./sidebar/sidebar.js";
 import { GestionHarryPotterApp } from "./apps/mainApp.js";
 
 Hooks.once("init", function () {
-  // Helper Handlebars
-  Handlebars.registerHelper("eq", (a, b) => a === b);
+  // Helpers Handlebars
+  Handlebars.registerHelper("eq",  (a, b) => a === b);
+  Handlebars.registerHelper("pct", (val, max) => Math.round((val ?? 0) / max * 100));
 
   game.settings.register(MODULE_ID, "debug", {
     name: "Debug",
@@ -66,7 +67,11 @@ Hooks.once("init", function () {
     scope: "world", config: false, type: Object, default: {}
   });
   game.settings.register(MODULE_ID, "quidditch-data", {
-    scope: "world", config: false, type: Object, default: {}
+    scope: "world", config: false, type: Object, default: {},
+    onChange: () => {
+      const app = foundry.applications.instances?.get("hp4-quidditch-app");
+      if (app?.rendered) app.render();
+    },
   });
 });
 

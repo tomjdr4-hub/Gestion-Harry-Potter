@@ -1,374 +1,211 @@
-/* ── Variables équipes ──────────────────────────────────────────────── */
+/* ── Variables ──────────────────────────────────────────────────────────── */
 :root {
-  --qa: #c0392b;   /* Team A — rouge */
-  --qb: #27ae60;   /* Team B — vert */
-  --qu: #e74c3c;   /* Souaffle */
-  --qg: #f1c40f;   /* Vif d'or */
-  --qd: #1a1a1a;   /* dark bg */
-  --qbr: #333;     /* border */
+  --qa:  #c0392b;   /* Équipe A — rouge */
+  --qb:  #27ae60;   /* Équipe B — vert  */
+  --qu:  #e74c3c;   /* Souaffle */
+  --qg:  #f1c40f;   /* Vif d'or */
 }
+
+.hp4-quidditch .window-content { padding: 0; }
 
 .quid-wrapper {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  padding: 0.75rem;
-  gap: 0.6rem;
-  overflow-y: auto;
-  box-sizing: border-box;
+  display: flex; flex-direction: column;
+  height: 100%; padding: 0.75rem; gap: 0.6rem;
+  overflow-y: auto; box-sizing: border-box;
 }
 
-/* ── Couleurs équipes ───────────────────────────────────────────────── */
-.quid-team-a   { color: var(--qa); }
-.quid-team-b   { color: var(--qb); }
-.quid-team-a-bg { background: rgba(192,57,43,0.2); border-color: var(--qa); }
-.quid-team-b-bg { background: rgba(39,174,96,0.2);  border-color: var(--qb); }
+/* ── Setup ──────────────────────────────────────────────────────────────── */
+.quid-setup { display: flex; flex-direction: column; align-items: center; gap: 1rem; padding: 1.5rem 0.5rem; }
+.quid-setup-title { color: var(--qg); font-size: 1.1rem; margin: 0; }
+.quid-teams-setup { display: flex; align-items: flex-start; gap: 1.5rem; flex-wrap: wrap; justify-content: center; }
+.quid-team-setup { display: flex; flex-direction: column; gap: 0.4rem; min-width: 160px; }
+.quid-team-setup label { font-size: 0.78rem; color: #aaa; }
+.quid-team-setup input { background: #222; border: 1px solid #444; color: #ddd; border-radius: 4px; padding: 0.3rem 0.5rem; font-size: 0.9rem; }
+.quid-vs { font-size: 1.4rem; font-weight: bold; color: #555; align-self: center; padding-top: 2rem; }
 
-/* ── Setup ──────────────────────────────────────────────────────────── */
-.quid-setup {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  padding: 2rem 1rem;
+.quid-actor-drop {
+  border: 2px dashed #444; border-radius: 6px; min-height: 64px;
+  display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+  padding: 0.5rem; cursor: default; transition: border-color 0.15s;
 }
+.quid-actor-drop.drag-over  { border-color: var(--qg); background: rgba(241,196,15,0.08); }
+.quid-actor-drop.quid-drop-filled { border-style: solid; border-color: #666; }
+.quid-actor-img  { width: 40px; height: 40px; border-radius: 4px; object-fit: cover; }
+.quid-actor-name { font-size: 0.85rem; flex: 1; }
+.quid-drop-hint  { font-size: 0.78rem; color: #666; }
+.quid-remove-btn { background: none; border: none; color: #c0392b; cursor: pointer; font-size: 0.9rem; padding: 0 0.2rem; }
+.quid-waiting    { color: #888; font-style: italic; font-size: 0.85rem; }
 
-.quid-logo {
-  font-size: 1.6rem;
-  font-weight: bold;
-  color: var(--qg);
-  letter-spacing: 0.1em;
-  text-shadow: 0 0 12px rgba(241,196,15,0.4);
-}
-
-.quid-setup-sub { color: #888; font-size: 0.85rem; margin: 0; }
-
-.quid-team-inputs {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.quid-team-slot {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-  align-items: center;
-}
-
-.quid-team-slot label {
-  font-size: 0.8rem;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.quid-team-slot input {
-  background: #222;
-  border: 1px solid #444;
-  color: #ddd;
-  border-radius: 4px;
-  padding: 0.35rem 0.5rem;
-  font-size: 0.9rem;
-  text-align: center;
-  width: 140px;
-}
-
-.quid-vs-badge {
-  font-size: 1.1rem;
-  font-weight: bold;
-  color: #555;
-  letter-spacing: 0.1em;
-}
-
-/* ── Boutons ────────────────────────────────────────────────────────── */
-.quid-btn-primary {
-  background: #7b2d2d;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  padding: 0.4rem 1rem;
-  cursor: pointer;
-  font-size: 0.85rem;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
+/* ── Boutons communs ────────────────────────────────────────────────────── */
+.quid-start {
+  background: #7b2d2d; color: #fff; border: none; border-radius: 5px;
+  padding: 0.5rem 1.4rem; cursor: pointer; font-size: 0.9rem; margin-top: 0.5rem;
   transition: background 0.15s;
 }
-.quid-btn-primary:hover { background: #9b3d3d; }
-
-.quid-btn-ghost {
-  background: #2a2a2a;
-  color: #aaa;
-  border: 1px solid #444;
-  border-radius: 5px;
-  padding: 0.4rem 0.8rem;
-  cursor: pointer;
-  font-size: 0.82rem;
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  transition: background 0.15s;
-}
-.quid-btn-ghost:hover { background: #3a3a3a; color: #ccc; }
-
-.quid-btn-dice {
-  background: #1a2a1a;
-  border: 1px solid #2d5a2d;
-  color: #7dc87d;
-  border-radius: 4px;
-  padding: 0.3rem 0.5rem;
-  cursor: pointer;
-  font-size: 0.85rem;
-  transition: background 0.15s;
-}
-.quid-btn-dice:hover { background: #243424; }
+.quid-start:hover { background: #9b3d3d; }
+.quid-btn-disabled { opacity: 0.4; cursor: not-allowed; }
 
 .quid-btn-sm {
-  background: #2a2a2a;
-  border: 1px solid #555;
-  color: #aaa;
-  border-radius: 4px;
-  padding: 0.25rem 0.5rem;
-  cursor: pointer;
-  font-size: 0.8rem;
+  background: #2a2a2a; border: 1px solid #555; color: #aaa;
+  border-radius: 4px; padding: 0.2rem 0.5rem; cursor: pointer; font-size: 0.78rem;
 }
 .quid-btn-sm:hover { background: #3a3a3a; color: #fff; }
+.quid-btn-danger { border-color: #7b2d2d; color: #c0392b; }
+.quid-btn-danger:hover { background: rgba(192,57,43,0.2); }
 
-/* ── Jauges ─────────────────────────────────────────────────────────── */
-.quid-gauges-bar {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: #111;
-  border: 1px solid var(--qbr);
-  border-radius: 8px;
-  padding: 0.55rem 0.75rem;
+.quid-btn-lock {
+  background: #1a3a1a; border: 1px solid #2d5a2d; color: #7dc87d;
+  border-radius: 5px; padding: 0.35rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  margin-top: 0.3rem; transition: background 0.15s; align-self: flex-start;
 }
+.quid-btn-lock:hover { background: #243424; }
 
-.quid-gauge-team {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
+.quid-btn-roll {
+  background: #1a2a3a; border: 1px solid #2d4a6a; color: #7db8d8;
+  border-radius: 5px; padding: 0.35rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  transition: background 0.15s;
 }
+.quid-btn-roll:hover { background: #243450; }
 
-.quid-gauge-name {
-  font-size: 0.8rem;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  margin-bottom: 0.15rem;
+.quid-btn-apply {
+  background: #2d5a2d; color: #fff; border: none; border-radius: 5px;
+  padding: 0.4rem 1.2rem; cursor: pointer; font-size: 0.88rem;
+  transition: background 0.15s; margin-top: 0.3rem;
 }
+.quid-btn-apply:hover { background: #3d7a3d; }
 
-.quid-gauge-row {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.quid-gauge-icon { font-size: 0.65rem; width: 14px; text-align: center; }
-.quid-icon-quaffle { color: var(--qu); }
-.quid-icon-vifDor  { color: var(--qg); }
-
-.quid-gauge-track {
-  flex: 1;
-  height: 7px;
-  background: #2a2a2a;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.quid-gauge-fill {
-  height: 100%;
-  border-radius: 4px;
-  transition: width 0.5s ease;
-  min-width: 0;
-}
-.quid-fill-quaffle { background: var(--qu); }
-.quid-fill-vifDor  { background: var(--qg); }
-
-.quid-gauge-pct { font-size: 0.68rem; color: #888; min-width: 28px; text-align: right; }
-
+/* ── En-tête commun ─────────────────────────────────────────────────────── */
+.quid-header-row { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
 .quid-round-badge {
-  font-size: 0.7rem;
-  font-weight: bold;
-  color: #c9a84c;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  text-align: center;
-  min-width: 50px;
+  font-size: 0.78rem; font-weight: bold; color: var(--qg);
+  text-transform: uppercase; letter-spacing: 0.08em; flex: 1;
 }
 
-/* ── Section title ──────────────────────────────────────────────────── */
-.quid-section-title {
-  font-size: 0.78rem;
-  font-weight: bold;
-  color: #c9a84c;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
+/* ── Jauges ─────────────────────────────────────────────────────────────── */
+.quid-gauges { display: flex; flex-direction: column; gap: 0.4rem; }
+.quid-gauge-block { display: flex; flex-direction: column; gap: 0.2rem; }
+.quid-gauge-label { font-size: 0.75rem; color: #aaa; font-weight: bold; }
+.quid-gauge-sub   { font-weight: normal; color: #666; }
+
+.quid-gauge-bar-wrap {
+  position: relative; height: 18px;
+  background: #222; border-radius: 4px; overflow: hidden;
+  display: flex; align-items: center;
+}
+.quid-gauge-bar {
+  position: absolute; top: 0; left: 0; height: 100%;
+  border-radius: 4px; transition: width 0.4s ease;
+  opacity: 0.7;
+}
+.quid-gauge-q-a { background: var(--qa); }
+.quid-gauge-q-b { background: var(--qb); }
+.quid-gauge-v-a { background: #b8860b; }
+.quid-gauge-v-b { background: var(--qg); }
+
+.quid-gauge-val {
+  position: absolute; font-size: 0.68rem; color: #fff;
+  z-index: 1; padding: 0 0.3rem; text-shadow: 0 0 4px rgba(0,0,0,0.8);
+  pointer-events: none; white-space: nowrap;
+}
+.quid-val-left  { left: 0; }
+.quid-val-right { right: 0; }
+
+/* ── Phase Choix ────────────────────────────────────────────────────────── */
+.quid-choice-panel {
+  border: 1px solid #444; border-radius: 6px;
+  padding: 0.6rem 0.75rem; display: flex; flex-direction: column; gap: 0.4rem;
+}
+.quid-choice-a { border-color: var(--qa); background: rgba(192,57,43,0.06); }
+.quid-choice-b { border-color: var(--qb); background: rgba(39,174,96,0.06);  }
+.quid-choice-panel.quid-locked { opacity: 0.7; }
+
+.quid-choice-team { font-size: 0.82rem; font-weight: bold; color: #ccc; }
+.quid-locked-msg  { font-size: 0.82rem; color: #7dc87d; margin: 0; font-style: italic; }
+
+.quid-choice-selects { display: flex; gap: 0.8rem; flex-wrap: wrap; }
+.quid-select-wrap { display: flex; flex-direction: column; gap: 0.2rem; }
+.quid-select-wrap label { font-size: 0.75rem; color: #888; }
+.quid-select-wrap select {
+  background: #222; border: 1px solid #444; color: #ddd;
+  border-radius: 4px; padding: 0.25rem 0.4rem; font-size: 0.83rem; cursor: pointer;
 }
 
-/* ── Choix postes ───────────────────────────────────────────────────── */
-.quid-choices {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
+.quid-status-row { display: flex; gap: 0.6rem; margin-top: 0.3rem; }
+.quid-status-pill {
+  font-size: 0.75rem; color: #666; border: 1px solid #333;
+  border-radius: 10px; padding: 0.15rem 0.6rem;
 }
+.quid-status-ok { color: #7dc87d; border-color: #2d5a2d; }
 
-.quid-choice-row {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.quid-team-label {
-  font-size: 0.8rem;
-  font-weight: bold;
-  min-width: 90px;
-}
-
-.quid-select {
-  flex: 1;
-  background: #222;
-  border: 1px solid #444;
-  color: #ddd;
-  border-radius: 4px;
-  padding: 0.25rem 0.4rem;
-  font-size: 0.82rem;
-  cursor: pointer;
-}
-
-/* ── Référence ──────────────────────────────────────────────────────── */
-.quid-ref {
-  background: #111;
-  border: 1px solid #2a2a2a;
-  border-radius: 6px;
-  padding: 0.4rem 0.6rem;
-  font-size: 0.72rem;
-  color: #888;
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-}
-.quid-ref-title { color: #c9a84c; font-weight: bold; }
-.quid-ref-neutral { color: #666; }
-
-/* ── Actions ────────────────────────────────────────────────────────── */
-.quid-actions {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: flex-end;
-  margin-top: auto;
-  padding-top: 0.25rem;
-}
-
-/* ── Confrontation ──────────────────────────────────────────────────── */
+/* ── Phase Révélation ───────────────────────────────────────────────────── */
 .quid-conf-grid {
-  display: grid;
-  grid-template-columns: 1fr 80px 1fr 120px;
-  gap: 0.3rem 0.5rem;
-  align-items: center;
+  display: grid; grid-template-columns: 1fr 100px 1fr;
+  gap: 0.25rem 0.5rem; align-items: center;
+  background: #111; border: 1px solid #2a2a2a;
+  border-radius: 6px; padding: 0.5rem 0.6rem;
 }
-
-.quid-poste-badge {
-  border: 1px solid currentColor;
-  border-radius: 4px;
-  padding: 0.2rem 0.4rem;
-  font-size: 0.8rem;
-  font-weight: bold;
-  text-align: center;
-}
-
-.quid-conf-mid {
-  font-size: 0.7rem;
-  color: #666;
-  text-align: center;
-}
-
-.quid-result-cell { font-size: 0.78rem; font-weight: bold; padding-left: 0.3rem; }
+.quid-conf-header { font-size: 0.72rem; font-weight: bold; color: #aaa; text-transform: uppercase; }
+.quid-col-a   { text-align: left; color: var(--qa); }
+.quid-col-b   { text-align: right; color: var(--qb); }
+.quid-col-mid { text-align: center; }
+.quid-conf-poste { font-size: 0.85rem; font-weight: bold; }
+.quid-conf-result { font-size: 0.78rem; font-weight: bold; }
 .qw-a  { color: var(--qa); }
 .qw-b  { color: var(--qb); }
-.qw-n  { color: #888; }
+.qw-n  { color: #666; }
 
-.quid-bonus-line {
-  font-size: 0.78rem;
-  color: #aaa;
-  text-align: center;
+.quid-bonus-row {
+  display: flex; justify-content: space-around; font-size: 0.78rem; color: #aaa;
+  background: #161616; border-radius: 4px; padding: 0.3rem 0.5rem;
 }
 
-/* ── Lancers ────────────────────────────────────────────────────────── */
-.quid-rolls { display: flex; flex-direction: column; gap: 0.4rem; }
-
-.quid-roll-row {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+.quid-roll-area { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+.quid-roll-block {
+  flex: 1; min-width: 140px; border: 1px solid #333; border-radius: 6px;
+  padding: 0.5rem 0.6rem; display: flex; flex-direction: column; gap: 0.35rem; align-items: flex-start;
+}
+.quid-roll-title    { font-size: 0.78rem; font-weight: bold; color: #aaa; text-transform: uppercase; }
+.quid-roll-result   { font-size: 1.1rem; font-weight: bold; color: #ddd; }
+.quid-bonus         { font-size: 0.78rem; color: #888; }
+.quid-wait          { font-size: 0.78rem; color: #666; font-style: italic; }
+.quid-manual-row    { display: flex; gap: 0.4rem; align-items: center; margin-top: 0.2rem; }
+.quid-manual-row input {
+  width: 46px; text-align: center; background: #1a1a1a;
+  border: 1px solid #444; color: #ddd; border-radius: 4px;
+  padding: 0.2rem; font-size: 0.9rem;
 }
 
-.quid-roll-input {
-  width: 46px;
-  text-align: center;
-  background: #1a1a1a;
-  border: 1px solid #444;
-  color: #ddd;
-  border-radius: 4px;
-  padding: 0.2rem;
-  font-size: 0.9rem;
+.quid-duel-banner {
+  text-align: center; font-size: 0.9rem; font-weight: bold;
+  padding: 0.4rem 0.6rem; border-radius: 6px;
+}
+.quid-tie   { background: rgba(100,100,100,0.2); border: 1px solid #555; color: #aaa; }
+.quid-win-a { background: rgba(192,57,43,0.15);  border: 1px solid var(--qa); color: var(--qa); }
+.quid-win-b { background: rgba(39,174,96,0.15);  border: 1px solid var(--qb); color: var(--qb); }
+
+.quid-effects-list { margin: 0; padding: 0.4rem 0.6rem; list-style: none; font-size: 0.8rem; color: #aaa; display: flex; flex-direction: column; gap: 0.2rem; }
+.quid-effects-list li::before { content: "→ "; color: #666; }
+
+.quid-proj-row { display: flex; flex-direction: column; gap: 0.15rem; font-size: 0.78rem; color: #888; padding: 0.2rem 0; }
+
+.quid-end-warning {
+  background: rgba(241,196,15,0.1); border: 1px solid var(--qg);
+  border-radius: 5px; padding: 0.4rem 0.6rem;
+  font-size: 0.82rem; color: var(--qg); font-weight: bold;
 }
 
-.quid-roll-display {
-  font-size: 1.1rem;
-  font-weight: bold;
-  color: #ddd;
-  min-width: 28px;
-  text-align: center;
+/* ── Phase Fin ──────────────────────────────────────────────────────────── */
+.quid-ended { display: flex; flex-direction: column; gap: 0.8rem; align-items: center; padding: 1rem 0.5rem; }
+.quid-victory-title { font-size: 1.2rem; font-weight: bold; color: var(--qg); letter-spacing: 0.08em; }
+.quid-vif-capture   { font-size: 0.92rem; color: #f39c12; }
+.quid-final-scores  { display: flex; flex-direction: column; gap: 0.3rem; width: 100%; }
+.quid-score-a { font-size: 0.9rem; color: var(--qa); padding: 0.25rem 0; }
+.quid-score-b { font-size: 0.9rem; color: var(--qb); padding: 0.25rem 0; }
+
+.quid-winner-banner {
+  font-size: 1.1rem; font-weight: bold; border-radius: 8px;
+  padding: 0.6rem 1.5rem; letter-spacing: 0.05em;
 }
-
-.quid-roll-eq {
-  font-size: 0.82rem;
-  color: #888;
-  margin-left: auto;
-}
-
-.quid-total-set { color: #c9a84c; font-size: 1rem; }
-
-/* ── Résultat duel ──────────────────────────────────────────────────── */
-.quid-duel-result {
-  text-align: center;
-  font-size: 0.95rem;
-  font-weight: bold;
-  padding: 0.4rem;
-  border-radius: 6px;
-  background: rgba(241,196,15,0.08);
-  border: 1px solid rgba(241,196,15,0.25);
-  color: #f1c40f;
-}
-
-.quid-win-banner { color: #f1c40f; }
-
-/* ── Effets ─────────────────────────────────────────────────────────── */
-.quid-effects {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  background: #111;
-  border: 1px solid #2a2a2a;
-  border-radius: 6px;
-  padding: 0.45rem 0.6rem;
-}
-
-.quid-effect-row {
-  font-size: 0.78rem;
-  color: #aaa;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.quid-effect-row i { color: #c9a84c; font-size: 0.65rem; }
+.quid-winner-win { background: rgba(241,196,15,0.15); border: 2px solid var(--qg); color: var(--qg); }
+.quid-winner-tie { background: rgba(100,100,100,0.15); border: 1px solid #555; color: #aaa; }
+.quid-gauges-final { width: 100%; }
