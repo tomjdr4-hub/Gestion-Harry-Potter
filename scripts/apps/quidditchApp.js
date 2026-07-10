@@ -62,6 +62,50 @@ export class QuidditchApp extends HandlebarsApplicationMixin(ApplicationV2) {
     await game.settings.set(MODULE_ID, "quidditch-data", store);
   }
 
+  // ─── Socket : joueurs ne peuvent pas écrire les settings world directement ──
+  // Les actions joueur passent par socket → GM écrit le setting
+  static async #dispatch(data) {
+    if (game.user.isGM) {
+      await QuidditchApp.#applyAction(data);
+    } else {
+      game.socket.emit(`module.${MODULE_ID}`, { ...data, _userId: game.user.id });
+    }
+  }
+
+  static async #applyAction(data) {
+    const store = QuidditchApp.getStore();
+    if (!store.current) return;
+
+    if (data.type === "quid-lock") {
+      const choice = { p1: data.p1, p2: data.p2, locked: true };
+      if (data.team === "A") {
+        store.current.choiceA = choice;
+        if (store.current.choiceB?.locked) store.phase = "reveal";
+      } else {
+        store.current.choiceB = choice;
+        if (store.current.choiceA?.locked) store.phase = "reveal";
+      }
+    } else if (data.type === "quid-roll") {
+      if (data.team === "A") store.current.rollA = data.value;
+      else                   store.current.rollB = data.value;
+    }
+    await QuidditchApp.saveStore(store);
+  }
+
+  // Appelé une fois au ready depuis main.js
+  static registerSocket() {
+    game.socket.on(`module.${MODULE_ID}`, async data => {
+      if (!game.user.isGM) return;
+      // Vérification basique : l'émetteur doit contrôler l'acteur de l'équipe
+      const store = QuidditchApp.getStore();
+      const teamData = data.team === "A" ? store.teamA : store.teamB;
+      const actor    = teamData?.actorId ? game.actors.get(teamData.actorId) : null;
+      const sender   = game.users.get(data._userId);
+      if (sender && actor && !actor.testUserPermission(sender, "OWNER")) return;
+      await QuidditchApp.#applyAction(data);
+    });
+  }
+
   // ─── Helpers ──────────────────────────────────────────────────────────────
   static #actorOf(actorId) { return actorId ? game.actors.get(actorId) : null; }
   static #canControl(actorId) {
@@ -281,11 +325,7 @@ export class QuidditchApp extends HandlebarsApplicationMixin(ApplicationV2) {
         const p1 = this.element.querySelector("#quid-p1a")?.value;
         const p2 = this.element.querySelector("#quid-p2a")?.value;
         if (!p1 || !p2) { ui.notifications.warn("Choisissez 2 postes."); return; }
-        const store = QuidditchApp.getStore();
-        store.current.choiceA = { p1, p2, locked: true };
-        if (store.current.choiceB?.locked) store.phase = "reveal";
-        await QuidditchApp.saveStore(store);
-        this.render();
+        await QuidditchApp.#dispatch({ type: "quid-lock", team: "A", p1, p2 });
       });
     }
 
@@ -294,11 +334,7 @@ export class QuidditchApp extends HandlebarsApplicationMixin(ApplicationV2) {
         const p1 = this.element.querySelector("#quid-p1b")?.value;
         const p2 = this.element.querySelector("#quid-p2b")?.value;
         if (!p1 || !p2) { ui.notifications.warn("Choisissez 2 postes."); return; }
-        const store = QuidditchApp.getStore();
-        store.current.choiceB = { p1, p2, locked: true };
-        if (store.current.choiceA?.locked) store.phase = "reveal";
-        await QuidditchApp.saveStore(store);
-        this.render();
+        await QuidditchApp.#dispatch({ type: "quid-lock", team: "B", p1, p2 });
       });
     }
 
@@ -328,33 +364,29 @@ export class QuidditchApp extends HandlebarsApplicationMixin(ApplicationV2) {
   #renderReveal(context) {
     const { isTeamA, isTeamB, isGM } = context;
 
-    // Lancer dé équipe A (le joueur A ou le MJ)
-    if (isTeamA && context.rollA === null) {
+    // Lancer dé équipe A (joueur A ou MJ)
+    if (isTeamA && !context.rollA) {
       this.element.querySelector(".quid-roll-a")?.addEventListener("click", async () => {
         const r = await new Roll("1d6").evaluate();
-        const store = QuidditchApp.getStore();
-        store.current.rollA = r.total;
-        await QuidditchApp.saveStore(store);
-        this.render();
+        await r.toMessage({ flavor: `${context.teamA.name} — Dé Quidditch` });
+        await QuidditchApp.#dispatch({ type: "quid-roll", team: "A", value: r.total });
       });
       this.element.querySelector(".quid-set-a")?.addEventListener("click", async () => {
         const v = parseInt(this.element.querySelector("#quid-input-a")?.value);
-        if (v >= 1 && v <= 6) { const s = QuidditchApp.getStore(); s.current.rollA = v; await QuidditchApp.saveStore(s); this.render(); }
+        if (v >= 1 && v <= 6) await QuidditchApp.#dispatch({ type: "quid-roll", team: "A", value: v });
       });
     }
 
-    // Lancer dé équipe B (le joueur B ou le MJ)
-    if (isTeamB && context.rollB === null) {
+    // Lancer dé équipe B (joueur B ou MJ)
+    if (isTeamB && !context.rollB) {
       this.element.querySelector(".quid-roll-b")?.addEventListener("click", async () => {
         const r = await new Roll("1d6").evaluate();
-        const store = QuidditchApp.getStore();
-        store.current.rollB = r.total;
-        await QuidditchApp.saveStore(store);
-        this.render();
+        await r.toMessage({ flavor: `${context.teamB.name} — Dé Quidditch` });
+        await QuidditchApp.#dispatch({ type: "quid-roll", team: "B", value: r.total });
       });
       this.element.querySelector(".quid-set-b")?.addEventListener("click", async () => {
         const v = parseInt(this.element.querySelector("#quid-input-b")?.value);
-        if (v >= 1 && v <= 6) { const s = QuidditchApp.getStore(); s.current.rollB = v; await QuidditchApp.saveStore(s); this.render(); }
+        if (v >= 1 && v <= 6) await QuidditchApp.#dispatch({ type: "quid-roll", team: "B", value: v });
       });
     }
 

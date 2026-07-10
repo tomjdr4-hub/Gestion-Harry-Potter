@@ -3,6 +3,7 @@
 import { MODULE_ID } from "./constants.js";
 import { registerSidebar } from "./sidebar/sidebar.js";
 import { GestionHarryPotterApp } from "./apps/mainApp.js";
+import { QuidditchApp } from "./apps/quidditchApp.js";
 
 Hooks.once("init", function () {
   // Helpers Handlebars
@@ -78,6 +79,7 @@ Hooks.once("init", function () {
 Hooks.once("ready", function () {
   console.debug(`[${MODULE_ID}] Module loaded`);
   registerSidebar();
+  QuidditchApp.registerSocket();
 
   if (game.user?.isGM) {
     const autoOpen = game.settings.get(MODULE_ID, "auto-open") ?? false;
