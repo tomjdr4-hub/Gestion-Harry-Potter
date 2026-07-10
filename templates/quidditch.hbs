@@ -212,19 +212,54 @@
           {{#if duel.tie}}Égalité — Aucun effet{{else}}{{duel.winName}} l'emporte — Écart : {{duel.ecart}}{{/if}}
         </div>
         {{#unless duel.tie}}
-          <ul class="quid-effects-list">
-            {{#each duel.effects}}<li>{{desc}}</li>{{/each}}
-          </ul>
-          <div class="quid-proj-row">
-            <span>{{teamA.name}} → Souaffle : {{duel.projA.quaffle}} / Vif d'or : {{duel.projA.vifDor}}</span>
-            <span>{{teamB.name}} → Souaffle : {{duel.projB.quaffle}} / Vif d'or : {{duel.projB.vifDor}}</span>
-          </div>
-          {{#if duel.endCheck}}
-            <div class="quid-end-warning">⚡ Condition de fin atteinte — Le match se terminera !</div>
+          {{#if duel.needsDistrib}}
+            {{#if duel.distribReady}}
+              <ul class="quid-effects-list">
+                {{#each duel.effects}}<li>{{desc}}</li>{{/each}}
+              </ul>
+              <div class="quid-proj-row">
+                <span>{{teamA.name}} → Souaffle : {{duel.projA.quaffle}} / Vif d'or : {{duel.projA.vifDor}}</span>
+                <span>{{teamB.name}} → Souaffle : {{duel.projB.quaffle}} / Vif d'or : {{duel.projB.vifDor}}</span>
+              </div>
+              {{#if duel.endCheck}}
+                <div class="quid-end-warning">⚡ Condition de fin atteinte — Le match se terminera !</div>
+              {{/if}}
+            {{else if duel.isDistribTeam}}
+              <div class="quid-distrib-form">
+                <div class="quid-distrib-title">Double victoire ! Répartis {{duel.distribMax}} points :</div>
+                <div class="quid-distrib-grid">
+                  <label>Ton Souaffle +</label>
+                  <input id="quid-distrib-ownQ" type="number" min="0" max="{{duel.distribMax}}" value="0" />
+                  <label>Ton Vif d'or +</label>
+                  <input id="quid-distrib-ownV" type="number" min="0" max="{{duel.distribMax}}" value="0" />
+                  <label>Souaffle adverse −</label>
+                  <input id="quid-distrib-oppQ" type="number" min="0" max="{{duel.distribMax}}" value="0" />
+                  <label>Vif d'or adverse −</label>
+                  <input id="quid-distrib-oppV" type="number" min="0" max="{{duel.distribMax}}" value="0" />
+                </div>
+                <div class="quid-distrib-hint">Total : {{duel.distribMax}} points à répartir</div>
+                <button class="quid-distrib-submit quid-btn-lock" type="button">Valider la répartition</button>
+              </div>
+            {{else}}
+              <div class="quid-distrib-waiting">En attente de la répartition de {{duel.distribTeamName}}…</div>
+            {{/if}}
+          {{else}}
+            <ul class="quid-effects-list">
+              {{#each duel.effects}}<li>{{desc}}</li>{{/each}}
+            </ul>
+            <div class="quid-proj-row">
+              <span>{{teamA.name}} → Souaffle : {{duel.projA.quaffle}} / Vif d'or : {{duel.projA.vifDor}}</span>
+              <span>{{teamB.name}} → Souaffle : {{duel.projB.quaffle}} / Vif d'or : {{duel.projB.vifDor}}</span>
+            </div>
+            {{#if duel.endCheck}}
+              <div class="quid-end-warning">⚡ Condition de fin atteinte — Le match se terminera !</div>
+            {{/if}}
           {{/if}}
         {{/unless}}
         {{#if isGM}}
-          <button class="quid-apply-btn quid-btn-apply" type="button">Appliquer les effets</button>
+          {{#if duel.distribReady}}
+            <button class="quid-apply-btn quid-btn-apply" type="button">Appliquer les effets</button>
+          {{/if}}
         {{/if}}
       {{/if}}
     {{/if}}

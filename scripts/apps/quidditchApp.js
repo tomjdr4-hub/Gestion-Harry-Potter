@@ -92,6 +92,10 @@ export class QuidditchApp extends HandlebarsApplicationMixin(ApplicationV2) {
     } else if (data.type === "quid-roll") {
       if (data.team === "A") store.current.rollA = data.value;
       else                   store.current.rollB = data.value;
+    } else if (data.type === "quid-distrib") {
+      const d = { ownQ: data.ownQ ?? 0, ownV: data.ownV ?? 0, oppQ: data.oppQ ?? 0, oppV: data.oppV ?? 0 };
+      if (data.team === "A") store.current.distribA = d;
+      else                   store.current.distribB = d;
     }
     await QuidditchApp.saveStore(store);
   }
@@ -187,40 +191,62 @@ export class QuidditchApp extends HandlebarsApplicationMixin(ApplicationV2) {
 
     let duel = null;
     if (rollA !== null && rollB !== null) {
-      const ecart = Math.abs(totA - totB);
+      const ecart  = Math.abs(totA - totB);
       const winKey = totA > totB ? "A" : totB > totA ? "B" : null;
+      const winBonus = winKey === "A" ? bonusA : winKey === "B" ? bonusB : 0;
+
+      // Si le gagnant a remporté les 2 confrontations → répartition libre
+      const needsDistrib = winKey !== null && winBonus === 2;
+      const distrib = winKey === "A" ? (cur.distribA ?? null) : winKey === "B" ? (cur.distribB ?? null) : null;
+      const distribReady = !needsDistrib || distrib !== null;
+      const distribMax = ecart * 2;
 
       const effects = [];
       const push = (pos, selfTeam, oppTeam, selfKey) => {
-        const eff = EFFECTS[pos] ?? [];
-        for (const e of eff) {
+        for (const e of (EFFECTS[pos] ?? [])) {
           const targetKey  = e.target === "self" ? selfKey : (selfKey === "A" ? "B" : "A");
           const targetName = e.target === "self" ? selfTeam.name : oppTeam.name;
           const delta      = e.dir * ecart;
           effects.push({ desc: `${POSTE_LABEL[pos]} (${selfTeam.name}) → ${e.label} ${targetName} ${delta >= 0 ? "+" : ""}${delta}`, gaugeKey: e.gauge, teamKey: targetKey, delta });
         }
       };
-      if (winKey === "A") {
-        push(cA.p1, teamA, teamB, "A");
-        push(cA.p2, teamA, teamB, "A");
-      } else if (winKey === "B") {
-        push(cB.p1, teamB, teamA, "B");
-        push(cB.p2, teamB, teamA, "B");
+
+      if (needsDistrib && distrib) {
+        // Effets librement répartis
+        const selfKey = winKey;
+        const oppKey  = winKey === "A" ? "B" : "A";
+        const sName   = winKey === "A" ? teamA.name : teamB.name;
+        const oName   = winKey === "A" ? teamB.name : teamA.name;
+        if (distrib.ownQ) effects.push({ desc: `Répartition → Souaffle ${sName} +${distrib.ownQ}`, gaugeKey: "quaffle", teamKey: selfKey, delta: +distrib.ownQ });
+        if (distrib.ownV) effects.push({ desc: `Répartition → Vif d'or ${sName} +${distrib.ownV}`,  gaugeKey: "vifDor",  teamKey: selfKey, delta: +distrib.ownV });
+        if (distrib.oppQ) effects.push({ desc: `Répartition → Souaffle ${oName} -${distrib.oppQ}`, gaugeKey: "quaffle", teamKey: oppKey,  delta: -distrib.oppQ });
+        if (distrib.oppV) effects.push({ desc: `Répartition → Vif d'or ${oName} -${distrib.oppV}`,  gaugeKey: "vifDor",  teamKey: oppKey,  delta: -distrib.oppV });
+      } else if (!needsDistrib) {
+        if (winKey === "A") { push(cA.p1, teamA, teamB, "A"); push(cA.p2, teamA, teamB, "A"); }
+        else if (winKey === "B") { push(cB.p1, teamB, teamA, "B"); push(cB.p2, teamB, teamA, "B"); }
       }
 
       // Jauges projetées
       const pA = { quaffle: teamA.quaffle, vifDor: teamA.vifDor };
       const pB = { quaffle: teamB.quaffle, vifDor: teamB.vifDor };
       for (const e of effects) {
-        const p = e.teamKey === "A" ? pA : pB;
+        const p   = e.teamKey === "A" ? pA : pB;
         const cap = e.gaugeKey === "vifDor" ? 200 : 100;
         p[e.gaugeKey] = Math.max(0, Math.min(cap, p[e.gaugeKey] + e.delta));
       }
+      const endCheck = distribReady
+        ? checkEnd({ ...teamA, quaffle: pA.quaffle, vifDor: pA.vifDor }, { ...teamB, quaffle: pB.quaffle, vifDor: pB.vifDor })
+        : null;
 
-      const endCheck = checkEnd({ ...teamA, quaffle: pA.quaffle, vifDor: pA.vifDor },
-                                 { ...teamB, quaffle: pB.quaffle, vifDor: pB.vifDor });
-
-      duel = { ecart, winKey, winName: winKey === "A" ? teamA.name : winKey === "B" ? teamB.name : null, tie: !winKey, totA, totB, effects, projA: pA, projB: pB, endCheck };
+      const isDistribTeam = winKey ? QuidditchApp.#canControl(winKey === "A" ? teamA.actorId : teamB.actorId) : false;
+      duel = {
+        ecart, winKey, winName: winKey === "A" ? teamA.name : winKey === "B" ? teamB.name : null,
+        tie: !winKey, totA, totB,
+        needsDistrib, distribReady, distribMax,
+        distribTeamName: winKey === "A" ? teamA.name : teamB.name,
+        isDistribTeam,
+        effects, projA: pA, projB: pB, endCheck,
+      };
     }
 
     const vLabel = v => v > 0 ? `${teamA.name} +1` : v < 0 ? `${teamB.name} +1` : "Neutre";
@@ -405,6 +431,25 @@ export class QuidditchApp extends HandlebarsApplicationMixin(ApplicationV2) {
       await QuidditchApp.saveStore(store);
       this.render();
     });
+
+    // Répartition libre (joueur gagnant les deux duels)
+    if (context.duel?.needsDistrib && !context.duel?.distribReady && context.duel?.isDistribTeam) {
+      this.element.querySelector(".quid-distrib-submit")?.addEventListener("click", async () => {
+        const get = id => parseInt(this.element.querySelector(id)?.value ?? "0") || 0;
+        const ownQ = get("#quid-distrib-ownQ");
+        const ownV = get("#quid-distrib-ownV");
+        const oppQ = get("#quid-distrib-oppQ");
+        const oppV = get("#quid-distrib-oppV");
+        const total = ownQ + ownV + oppQ + oppV;
+        const max = context.duel.distribMax;
+        if (total !== max) {
+          ui.notifications.warn(`La somme doit être exactement ${max} (actuellement ${total}).`);
+          return;
+        }
+        const team = context.duel.winKey;
+        await QuidditchApp.#dispatch({ type: "quid-distrib", team, ownQ, ownV, oppQ, oppV });
+      });
+    }
 
     // Appliquer les effets (GM)
     if (isGM) {

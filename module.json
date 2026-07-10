@@ -2,7 +2,8 @@
   "id": "gestion-harry-potter",
   "title": "Gestion Harry Potter",
   "description": "Outil de gestion pour campagnes Harry Potter : classes, emploi du temps, PNJ, clubs et Coupe des Quatre Maisons.",
-  "version": "0.7.2",
+  "version": "0.7.3",
+  "socket": true,
   "compatibility": {
     "minimum": "14",
     "verified": "14"
@@ -26,5 +27,5 @@
     "styles/quidditch.css"
   ],
   "manifest": "https://raw.githubusercontent.com/tomjdr4-hub/Gestion-Harry-Potter/main/module.json",
-  "download": "https://github.com/tomjdr4-hub/Gestion-Harry-Potter/releases/download/v0.7.2/gestion-harry-potter.zip"
+  "download": "https://github.com/tomjdr4-hub/Gestion-Harry-Potter/releases/download/v0.7.3/gestion-harry-potter.zip"
 }

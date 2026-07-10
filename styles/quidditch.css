@@ -194,6 +194,32 @@
   font-size: 0.82rem; color: var(--qg); font-weight: bold;
 }
 
+/* ── Répartition libre ──────────────────────────────────────────────────── */
+.quid-distrib-form {
+  border: 1px solid var(--qg); border-radius: 6px;
+  background: rgba(241,196,15,0.06); padding: 0.6rem 0.75rem;
+  display: flex; flex-direction: column; gap: 0.5rem;
+}
+.quid-distrib-title {
+  font-size: 0.85rem; font-weight: bold; color: var(--qg);
+}
+.quid-distrib-grid {
+  display: grid; grid-template-columns: 1fr auto;
+  gap: 0.3rem 0.6rem; align-items: center;
+}
+.quid-distrib-grid label { font-size: 0.8rem; color: #bbb; }
+.quid-distrib-grid input {
+  width: 60px; text-align: center; background: #1a1a1a;
+  border: 1px solid #555; color: #ddd; border-radius: 4px;
+  padding: 0.2rem; font-size: 0.9rem;
+}
+.quid-distrib-hint { font-size: 0.75rem; color: #888; font-style: italic; }
+.quid-distrib-waiting {
+  font-size: 0.82rem; color: #888; font-style: italic;
+  background: #161616; border-radius: 4px; padding: 0.4rem 0.6rem;
+  text-align: center;
+}
+
 /* ── Phase Fin ──────────────────────────────────────────────────────────── */
 .quid-ended { display: flex; flex-direction: column; gap: 0.8rem; align-items: center; padding: 1rem 0.5rem; }
 .quid-victory-title { font-size: 1.2rem; font-weight: bold; color: var(--qg); letter-spacing: 0.08em; }
